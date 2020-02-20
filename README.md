@@ -14,13 +14,16 @@ where the `DEFAULT_DATASET_VALUE` is one of `"training"/"validation"/"testing"`;
 
 Place your edited copy into a directory we will call `json_dir`.
 
-2.  Edit `example_experiment_manifest.yaml` to something sensible for your case.  In the very least, you should:
+2.  Edit `example_experiment_manifest.yaml` to something sensible for your case.  The *most important thing to know* is that many of the classes in this package (and `machine_learning`) load their default attributes from this `manifest`.  That means that, even though the keyword arguments for their constructors (`__init__()` methods) may appear to default to `None`, this `None` actually instructs the class to default to the argument's value in the `manifest`.
+
+You don't have to set all the values before your first run, but in the very least, you should:
   * Fix the paths/dirs.  For the most part they are for writing, not reading, so you can set them wherever you like.  For the three reading paths:
     * `json_dir` must point to the location of your `block_breakdowns.json` file (see previous item).
     * `channels_path` must point to a (possibly empty) plain-text file listing (one entry per line) any bad channels.  NB that these are assumed to be 1-indexed!
     * `electrode_path`: you can ignore this unless you plan to plot results on the cortical surface (in which case contact me).
-  * Additionally, if you want to allow blocks of a certain type (see previous item) to appear in one of the `training/validation/testing` sets, you need to fill in the `block_types` entry accordingly.  (In the `example_experiment_manifest`, the `testing` and `validation` sets are allowed to include only `mocha-1`, but the training set is allowed to include `mocha-1, ..., mocha-9`.)
+  * Additionally, if you want to allow blocks of a certain type (see previous item) to appear in one of the `training/validation/testing` sets, you need to fill in the `block_types` entry accordingly.  (For example, in the `example_experiment_manifest.yaml`, the `testing` and `validation` sets are allowed to include only `mocha-1`, but the training set is allowed to include `mocha-1, ..., mocha-9`.)
+  * `grid_size`: set this to match the dimensions of your ECoG grid
+  * `vocab_file`: 
+  * `DataGenerator`: see below.
 
-grid_size
-
-Not every one is necessary for _training_ a network (e.g., the `png_partial_path` is only used for plotting).  My recommendation is to fill in as many as you think you understand, then see if you can get away with filling in no more.
+You can probably get away with leaving the rest of the values in the `.yaml` at their default values, at least for your first run.
