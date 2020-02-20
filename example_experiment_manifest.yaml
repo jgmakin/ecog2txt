@@ -48,7 +48,7 @@
     decoder_targets: text_sequence
     encoder_inputs: ecog_sequence
     encoder_targets: audio_sequence
-  electrode_path: /home/username/data/Subj400/TDT_elecs_all.mat
+  electrode_path: /home/username/data/ecog2txt/SUBJ400/TDT_elecs_all.mat
   elevation: 0
   grid_size:
   - 16
@@ -75,16 +75,16 @@
   num_cepstral_coeffs: 13
   num_mel_features: 26
   phoneme_sequence_penalty_scale: 1.0
-  png_partial_path: /home/username/figures/DSftHC/word_sequence/Subj400/{0}.png
-  project: Subj
+  png_partial_path: /home/username/figures/ecog2txt/word_sequence/SUBJ400/{0}.png
+  project: SUBJ
   sampling_rate: 200
   sampling_rate_decimated: 16.5
   saved_results_dir: /home/username/data/ecog2txt/word_sequence/saved_results
-  subject_name: Subj400
+  subject_name: SUBJ400
   temperature: 0.384
-  tf_record_partial_path: /home/username/data/ecog2txt/word_sequence/tf_records/Subj400_B{0}.tfrecord
+  tf_record_partial_path: /home/username/data/ecog2txt/word_sequence/tf_records/SUBJ400_B{0}.tfrecord
   tf_summaries_dir: /home/username/data/ecog2txt/word_sequence/tf_summaries
-  tikz_partial_path: /home/username/tikz/DSftHC/word_sequence/Subj400/{0}.tex
+  tikz_partial_path: /home/username/tikz/ecog2txt/word_sequence/SUBJ400/{0}.tex
   token_type: word_sequence
   vocab_file: vocab.mocha-timit.1806
 401:
@@ -137,7 +137,7 @@
     decoder_targets: text_sequence
     encoder_inputs: ecog_sequence
     encoder_targets: audio_sequence
-  electrode_path: /home/username/data/Subj401/TDT_elecs_all.mat
+  electrode_path: /home/username/data/ecog2txt/SUBJ401/TDT_elecs_all.mat
   elevation: 0
   grid_size:
   - 16
@@ -165,15 +165,15 @@
   num_mel_features: 26
   num_unique_training_sentences: null
   phoneme_sequence_penalty_scale: 1.0
-  png_partial_path: /home/username/figures/DSftHC/word_sequence/Subj401/{0}.png
-  project: Subj
+  png_partial_path: /home/username/figures/ecog2txt/word_sequence/SUBJ401/{0}.png
+  project: SUBJ
   sampling_rate: 200
   sampling_rate_decimated: 16.5
   saved_results_dir: /home/username/data/ecog2txt/word_sequence/saved_results
-  subject_name: Subj401
+  subject_name: SUBJ401
   temperature: 0.384
-  tf_record_partial_path: /home/username/data/ecog2txt/word_sequence/tf_records/Subj401_B{0}.tfrecord
+  tf_record_partial_path: /home/username/data/ecog2txt/word_sequence/tf_records/SUBJ401_B{0}.tfrecord
   tf_summaries_dir: /home/username/data/ecog2txt/word_sequence/tf_summaries
-  tikz_partial_path: /home/username/tikz/DSftHC/word_sequence/Subj401/{0}.tex
+  tikz_partial_path: /home/username/tikz/ecog2txt/word_sequence/SUBJ401/{0}.tex
   token_type: word_sequence
   vocab_file: vocab.mocha-timit.1806

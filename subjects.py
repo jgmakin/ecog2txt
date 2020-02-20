@@ -34,6 +34,7 @@ class ECoGSubject:
         decimation_factor=None,
         #####
         # in the manifest
+        block_types=None,
         data_mapping=None,
         sampling_rate_decimated=None,
         #####
@@ -65,15 +66,11 @@ class ECoGSubject:
         # get the block_breakdowns
         json_dir = manifest['json_dir']
         with open(os.path.join(json_dir, 'block_breakdowns.json')) as f:
-            block_breakdowns = json.load(f, object_hook=str2int_hook)[subj_id]
+            self.block_breakdowns = json.load(f, object_hook=str2int_hook)[subj_id]
 
         # these attributes will *not* be accessed by a SequenceNet
         DataGenerator = manifest['DataGenerator']
         self.data_generator = DataGenerator(manifest, subj_id, **dict(_DG_kwargs))
-
-        # ...
-        self._block_dict = block_breakdowns
-        self._block_types = manifest['block_types']
 
         # these attribute *will* be accessed by a SequenceNet
         self.target_specs = dict(target_specs)
@@ -114,7 +111,7 @@ class ECoGSubject:
                 data_partition: {
                     blk for blk in self._block_dict if
                     self._block_dict[blk]['default_dataset'] == data_partition and
-                    self._block_dict[blk]['type'] in self._block_types[data_partition]
+                    self._block_dict[blk]['type'] in self.block_types[data_partition]
                 } for data_partition in DATA_PARTITIONS
             }
             if self.pretrain_all_blocks:

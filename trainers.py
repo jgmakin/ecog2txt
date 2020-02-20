@@ -680,7 +680,7 @@ class MultiSubjectTrainer:
 
     def subject_to_table(self):
         subject_attributes = {
-            '_block_types',
+            'block_types',
             'block_ids',
             'decimation_factor',
         }
