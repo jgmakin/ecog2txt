@@ -105,7 +105,7 @@ class DecodingResults:
             print(*args, **kwargs)
 
 
-class ResultsPlotter:
+class ResultsPlotter():
     @auto_attribute(CHECK_MANIFEST=True)
     def __init__(
         self,
@@ -131,6 +131,7 @@ class ResultsPlotter:
         tikz_partial_path=None,
         png_partial_path=None,
         anatomy_grand_list=None,
+        #####
     ):
 
         # LOAD OCCLUSION-TRAINED DECODING RESULTS

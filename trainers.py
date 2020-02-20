@@ -46,8 +46,8 @@ class MultiSubjectTrainer:
         unique_encoder_targets_list=None,
         SN_kwargs=(),
         DG_kwargs=(),
-        DR_kwargs=(),
-        data_mapping=None,
+        RP_kwargs=(),
+        ES_kwargs=(),
         VERBOSE=True
     ):
 
@@ -61,7 +61,7 @@ class MultiSubjectTrainer:
 
         # attribute
         self._token_type = token_type   # NB: changes will not propagate
-        self._DR_kwargs = dict(DR_kwargs)
+        self._RP_kwargs = dict(RP_kwargs)
 
         # create ECoG subjects
         self.ecog_subjects = [
@@ -69,7 +69,7 @@ class MultiSubjectTrainer:
                 self.experiment_manifest[subject_id],
                 subject_id,
                 pretrain_all_blocks=(subject_id != subject_ids[-1]),
-                data_mapping=data_mapping,
+                **dict(ES_kwargs),
                 _DG_kwargs=dict(DG_kwargs)
                 #####
                 # target_specs=target_specs
@@ -261,7 +261,7 @@ class MultiSubjectTrainer:
         subject = self.ecog_subjects[-1]
         results_plotter = plotters.ResultsPlotter(
             self.experiment_manifest[subject.subnet_id], subject,
-            VERBOSE=self.VERBOSE, **self._DR_kwargs
+            VERBOSE=self.VERBOSE, **self._RP_kwargs
         )
 
         # set up methods
