@@ -13,7 +13,7 @@ In order to unify the vast set of parameters (paths, experimental block structur
   ```
   SUBJECT_ID: {BLOCK: {"type: BLOCK_TYPE, "default_dataset": DEFAULT_DATASET_VALUE}}`
   ```
-where the `DEFAULT_DATASET_VALUE` is one of `"training"/"validation"/"testing"`; and the `BLOCK_TYPE` is whatever descriptive title you want to give to your block (e.g., `"mocha-3"`).  Assigning types to the blocks allows them to be filtered out of datasets, according to information provided in the `experiment_manifest.yaml` (see next item).
+    where the `DEFAULT_DATASET_VALUE` is one of `"training"/"validation"/"testing"`; and the `BLOCK_TYPE` is whatever descriptive title you want to give to your block (e.g., `"mocha-3"`).  Assigning types to the blocks allows them to be filtered out of datasets, according to information provided in the `experiment_manifest.yaml` (see next item).
 
 Place your edited copy into a directory we will call `json_dir`.
 
