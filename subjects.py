@@ -93,9 +93,7 @@ class ECoGSubject:
 
         # make this input mask consistent with this subject
         if self._input_mask is not None:
-            self._input_mask.subj_id = self.subnet_id
-            self._input_mask.channels_path = os.path.join(
-                self.data_generator.channels_dir, 'channels.json')
+            self._input_mask.good_channels = self.data_generator.good_channels
 
     # ATTRIBUTES THAT *WILL* BE ACCESSED BY A SequenceNet
     @property
@@ -401,6 +399,10 @@ class SequenceDataManifest:
         self._distribution = distribution
 
 
+################
+# This is probably semi-broken and in any case should be brought up to date
+#  with the rest of the package.
+################
 class SubgridParams:
     @auto_attribute
     def __init__(
@@ -411,8 +413,7 @@ class SubgridParams:
         SUBSAMPLE=False,
         OCCLUDE=False,
         subj_id=None,
-        channels_path=None,
-        num_channels=None,
+        good_channels=None,
     ):
 
         # set default values
@@ -426,9 +427,13 @@ class SubgridParams:
         self.inds = None
 
     @property
-    def _channels(self):
-        # arrange channels in a square (matrix)
-        full_grid_channels = np.reshape(
+    def _electrodes(self):
+        ###########
+        # This should probably use elec_layout directly....
+        ###########
+
+        # arrange electrodes in a rectilinear grid (matrix)
+        full_grid_electrodes = np.reshape(
             np.arange(np.prod(self.grid_size)), self.grid_size)
 
         # subgrid_size is a list of either two ints or strs specifying anatomy
@@ -444,32 +449,27 @@ class SubgridParams:
 
             # if "tall," the matrix must be transposed before flattening
             if self.subgrid_size[0] > self.subgrid_size[1]:
-                full_grid_channels = full_grid_channels.T
+                full_grid_electrodes = full_grid_electrodes.T
                 self.start.reverse()
                 stop.reverse()
 
-        return np.reshape(full_grid_channels[
+        return np.reshape(full_grid_electrodes[
             self.start[0]:stop[0]:step[0], self.start[1]:stop[1]:step[1]], -1)
 
     @property
     def inds(self):
         if self._inds is not None:
             return self._inds
-        elif self.subj_id is not None and self.channels_path is not None:
-            # Load the *good-channel* indices on the *full* grid. The good
-            #  channels on the *sub*grid are their intersection with the
-            #  inds.
-            with open(self.channels_path) as f:
-                channels_dict = json.load(f, object_hook=str2int_hook)
-            full_grid_channels = channels_dict[self.subj_id]
+
+        if self.good_channels is not None:
             if self.OCCLUDE:
                 # only *exclude* the subgrid
-                return [full_grid_channels.index(i) for i in full_grid_channels
-                        if i not in self._channels]
+                return [i for i, e in enumerate(self.good_channels)
+                        if e not in self._electrodes]
             else:
                 # only *include* the subgrid
-                return [full_grid_channels.index(i) for i in full_grid_channels
-                        if i in self._channels]
+                return [i for i, e in enumerate(self.good_channels)
+                        if e in self._electrodes]
         else:
             return None
 

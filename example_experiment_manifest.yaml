@@ -25,6 +25,7 @@
   assessment_epoch_interval: 10
   audio_sequence_penalty_scale: 0.1
   azimuth: 0
+  bad_electrodes_path: /home/username/data/ecog2txt/SUBJ400/bad_electrodes.json 
   beam_width: 1
   block_descriptors:
   - type
@@ -43,7 +44,6 @@
       mocha-9: null
     validation: !!set
       mocha-1: null
-  channels_path: /home/username/data/ecog2txt/word_sequence/tf_records/channels.json
   data_mapping:
     decoder_targets: text_sequence
     encoder_inputs: ecog_sequence
@@ -114,6 +114,7 @@
   assessment_epoch_interval: 10
   audio_sequence_penalty_scale: 0.1
   azimuth: 180
+  bad_electrodes_path: /home/username/data/ecog2txt/SUBJ400/bad_electrodes.json 
   beam_width: 1
   block_descriptors:
   - type
@@ -132,7 +133,6 @@
       mocha-9: null
     validation: !!set
       mocha-1: null
-  channels_path: /home/username/data/ecog2txt/word_sequence/tf_records/channels.json
   data_mapping:
     decoder_targets: text_sequence
     encoder_inputs: ecog_sequence

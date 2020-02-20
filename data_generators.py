@@ -60,10 +60,9 @@ class ECoGDataGenerator:
         sampling_rate=None,
         token_type=None,
         vocab_file=None,
-        channels_path=None,
+        bad_electrodes_path=None,
         tf_record_partial_path=None,
         grid_size=None,
-        badchannels_path=None,
         max_seconds=None,
         max_samples=None,
         good_electrodes=None,
@@ -112,16 +111,15 @@ class ECoGDataGenerator:
             return None
 
     @property
-    def badchannels_path(self):
-        if self._badchannels_path is not None:
-            return self._badchannels_path
+    def bad_electrodes_path(self):
+        if self._bad_electrodes_path is not None:
+            return self._bad_electrodes_path
         else:
-            return os.path.join(
-                os.path.join(os.path.dirname(__file__)), 'badchannels')
+            return os.path.join(text_dir, 'bad_electrodes')
 
-    @badchannels_path.setter
-    def badchannels_path(self, badchannels_path):
-        self._badchannels_path = badchannels_path
+    @bad_electrodes_path.setter
+    def bad_electrodes_path(self, bad_electrodes_path):
+        self._bad_electrodes_path = bad_electrodes_path
 
     @property
     def tf_record_partial_path(self):
@@ -177,7 +175,7 @@ class ECoGDataGenerator:
     @property
     def good_electrodes(self):
         '''
-        NB!!! badchannels are 1-indexed, good_electrodes are zero-indexed!!
+        NB!!! bad_electrodes are 1-indexed, good_electrodes are zero-indexed!!
 
         Since this is a set, it contains no order information.  The canonical
         ordering is established with good_channels, since after all the data
@@ -185,12 +183,12 @@ class ECoGDataGenerator:
         '''
 
         if self._good_electrodes is None:
-            # construct by first loading the *bad*channels
-            with open(self.badchannels_path, 'r') as f:
-                bad_channels = f.readlines()
-            bad_channels = [int(channel.strip()) for channel in bad_channels]
+            # construct by first loading the *bad*_electrodes
+            with open(self.bad_electrodes_path, 'r') as f:
+                bad_electrodes = f.readlines()
+            bad_electrodes = [int(e.strip()) for e in bad_electrodes]
             return (set(range(np.prod(self.grid_size))) -
-                    set(np.array(bad_channels)-1))
+                    set(np.array(bad_electrodes)-1))
         else:
             return self._good_electrodes
 
@@ -291,23 +289,6 @@ class ECoGDataGenerator:
         for example_dict in self._ecog_token_generator(block):
             feature_example = tfh.make_feature_example(example_dict)
             writer.write(feature_example.SerializeToString())
-
-    def _ecog_token_generator(self, block):
-        """A generator that yields a dictionary with:
-            `ecog_sequence`: ecog data, only b/n the start and end of tokens;
-            `text_sequence`: the corresponding text tokens;
-            `audio_sequence`: the corresponding audio (MFCC) tokens;
-            `phoneme_sequence`: ditto for phonemes--with repeats
-        """
-
-        # write to disk (by this point the grid_size and paths should be set)
-        self._write_good_electrodes()
-
-        # get the field potentials separately
-        field_potentials = self._get_field_potentials(block)
-
-        # ...
-        yield from self._ecog_generator(block, field_potentials)
 
     def _get_MFCC_features(self, index, winstep, nfft=512):
 
@@ -422,23 +403,6 @@ class ECoGDataGenerator:
 
         return unique_targets_list
 
-    def _write_good_electrodes(self):
-
-        # get or create a channels file
-        if os.path.isfile(self.channels_path):
-            # file already exists; load it
-            with open(self.channels_path) as f:
-                num_electrodes_dict = json.load(f)
-        else:
-            # file doesn't exist; create dictionary from scratch
-            num_electrodes_dict = {}
-
-        # write the pseudochannels to the json file
-        num_electrodes_dict[str(self.subj_id)] = sorted(list(
-            self.good_electrodes))
-        with open(self.channels_path, 'w') as f:
-            json.dump(num_electrodes_dict, f, sort_keys=True, indent=4)
-
     def _sentence_tokenize(self, token_list):
         # NB that conversion to UTF-8 (bytes objects) also happens here:
         #  token_list is a list of *strings*, but the tokenized_sentence is a
@@ -509,9 +473,13 @@ class ECoGDataGenerator:
         num_examples = None
         return num_examples
 
-    def _ecog_generator(self, block, field_potentials):
+    def _ecog_token_generator(self, block):
         '''
-        Generate a dictionary of sequence data.
+        A generator that yields a dictionary with:
+            `ecog_sequence`: ECoG data, clipped to token(-sequence) length
+            `text_sequence`: the corresponding text token(-sequence)
+            `audio_sequence`: the corresponding audio (MFCC) token sequence
+            `phoneme_sequence`: ditto for phonemes--with repeats
         '''
 
         for i in range(0):

@@ -2,11 +2,10 @@
 import pdb
 import os
 import re
-import json
 import yaml
 from functools import reduce
 from collections import defaultdict
-import shutil
+
 
 # third-party packages
 import numpy as np
@@ -40,7 +39,6 @@ class MultiSubjectTrainer:
         experiment_manifest_name,
         subject_ids,
         checkpoint_dir='',
-        model_description_dir='',
         restore_epoch=None,
         unique_targets_list=None,
         unique_encoder_targets_list=None,
@@ -93,7 +91,6 @@ class MultiSubjectTrainer:
         #  must be invoked *after* those are created.  Hence no auto_attribute!
         self.VERBOSE = VERBOSE
         self.checkpoint_dir = checkpoint_dir
-        self.model_description_dir = model_description_dir
         self.restore_epoch = restore_epoch
         self.unique_targets_list = unique_targets_list
         self.unique_encoder_targets_list = unique_encoder_targets_list
@@ -151,14 +148,6 @@ class MultiSubjectTrainer:
 
         # make sure the self.net.checkpoint_path gets updated as well
         self.checkpoint_dir
-
-    @property
-    def model_description_dir(self):
-        return self._model_description_dir
-
-    @model_description_dir.setter
-    def model_description_dir(self, model_description_dir):
-        self._model_description_dir = model_description_dir
 
     @property
     def restore_epoch(self):
@@ -579,93 +568,6 @@ class MultiSubjectTrainer:
                 fig.savefig(os.path.join(
                     save_file_dir, '%s_confusions.pdf' % self._token_type),
                     bbox_inches='tight')
-
-    def _write_model_description(
-        self, extra_description='', num_sequences=1, max_hyp_length=20
-    ):
-
-        '''
-        The method writes 4 files:
-            model_description.json
-            channels.json
-            unique_targets.pkl
-            saved_model.pb
-            variables/variables.data-00000-of-00001
-            variables/variables.index
-        '''
-
-        # the relevant params are for the last subject you trained on
-        subject = self.ecog_subjects[-1]
-        experiment_manifest = self.experiment_manifest[subject.subnet_id]
-
-        # set up paths
-        save_dir = self.model_description_dir
-        if extra_description:
-            save_dir += ('_' + extra_description)
-        model_description_path = os.path.join(save_dir, 'model_description.json')
-        channels_read_path = subject.data_generator.channels_path
-        channels_write_path = os.path.join(save_dir, 'channels.json')
-        UTL_read_path = os.path.join(self.checkpoint_dir, 'unique_targets.pkl')
-        UTL_write_path = os.path.join(save_dir, 'unique_targets.pkl')
-
-        # gather up the checkpoint files from the restore_epoch
-        checkpoint_files = [
-            file for file in os.listdir(self.checkpoint_dir)
-            if 'model.ckpt-{0}.'.format(self.restore_epoch) in file]
-
-        # ...
-        data_partition_dict = {
-            partition: {
-                **{
-                    descriptor: list({
-                        subject._block_dict[block][descriptor]
-                        for block in subject.block_ids[partition]})
-                    for descriptor in experiment_manifest['block_descriptors']
-                },
-                'blocks': sorted(list(subject.block_ids[partition]))
-            } for partition in ['training', 'validation']
-        }
-
-        # now assemble the complete dictionary
-        #######
-        # POSSIBLY BROKEN; PLEASE FIX.
-        try:
-            pre_cue_seconds = subject.data_generator.pre_cue_seconds
-        except:
-            pre_cue_seconds = 0.0
-        cue_window = [
-            -pre_cue_seconds,
-            subject.data_generator.max_seconds - pre_cue_seconds
-        ]
-
-        model_description = {
-            'model_class': experiment_manifest['model_class'],
-            'cue_window': cue_window,
-            #####
-            # ugh, hard-coded
-            'detection_window': [-1.25, 2.0],
-            'input_streams': ["neural/hgacar200_running30"]
-            #####
-            **data_partition_dict,
-            'constructor_kwargs': {'subject': experiment_manifest[
-                'project'] + '%i' % subject.subnet_id},
-            'model_goal': ('decoding' if 'sequence' in self._token_type
-                           else 'classification'),
-        }
-
-        # save/copy
-        self.net.save_prediction_graph(
-            self.ecog_subjects[-1:], self.unique_targets_list,
-            self.restore_epoch, save_dir,
-            num_sequences=num_sequences, max_hyp_length=max_hyp_length
-        )
-        with open(model_description_path, 'w') as f:
-            json.dump(model_description, f, indent=4)
-        shutil.copyfile(channels_read_path, channels_write_path)
-        shutil.copyfile(UTL_read_path, UTL_write_path)
-        for file in checkpoint_files:
-            shutil.copyfile(os.path.join(self.checkpoint_dir, file),
-                            os.path.join(save_dir, file))
 
     def count_all_targets(self, threshold=0.4):
 

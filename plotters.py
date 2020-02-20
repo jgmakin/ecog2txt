@@ -573,8 +573,7 @@ class ResultsPlotter():
                 grid_size=self.grid_size, subgrid_size=subgrid_size,
                 start=[0, 0], SUBSAMPLE=False, OCCLUDE=False)
             input_mask.subj_id = self.subject.subnet_id
-            input_mask.channels_path = os.path.join(
-                self.subject.data_generator.channels_dir, 'channels.json')
+            input_mask.good_channels = self.subject.data_generator.good_channels
 
             # malloc
             WERs_list = [[] for ind in range(
