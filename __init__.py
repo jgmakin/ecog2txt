@@ -5,15 +5,8 @@ import os
 import pandas as pd
 from tensor2tensor.data_generators import text_encoder
 
-# local
-from ..utils_jgm.machine_compatibility_utils import MachineCompatibilityUtils
-
 # paths
-MCUs = MachineCompatibilityUtils()
 text_dir = os.path.join(os.path.dirname(__file__), 'auxiliary')
-tikz_dir = os.path.join(MCUs.get_path('tikz'), 'DSftHC')
-data_dir = os.path.join(MCUs.get_path('data'), 'ecog2txt')
-figs_dir = os.path.join(MCUs.get_path('figs'), 'DSftHC')
 
 # other useful variables
 EOS_token = text_encoder.EOS

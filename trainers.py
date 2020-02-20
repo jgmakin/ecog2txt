@@ -13,20 +13,21 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 import pandas as pd
+import tensorflow as tf
 from tensorflow.python import pywrap_tensorflow
 from tensorflow.python.tools.inspect_checkpoint import print_tensors_in_checkpoint_file
 
 # local
-from ..utils_jgm.toolbox import heatmap_confusions
+from ..utils_jgm.toolbox import heatmap_confusions, MutableNamedTuple
 from ..machine_learning.neural_networks import sequence_networks
 from ..machine_learning.neural_networks import tf_helpers as tfh
 from ..machine_learning.neural_networks import basic_components as nn
 
 from .subjects import ECoGSubject
 from . import plotters
-from . import str2int_hook
-from . import text_dir, data_dir
+from . import text_dir
 from . import EOS_token, pad_token, OOV_token, TOKEN_TYPES, DATA_PARTITIONS
+
 
 '''
 :Author: J.G. Makin (except where otherwise noted)
@@ -136,23 +137,11 @@ class MultiSubjectTrainer:
     @property
     def checkpoint_dir(self):
 
-        assert self._checkpoint_dir is not None, "checkpoint_dir can't be None"
-
-        # try interpreting the _checkpoint_dir as a subdir
-        ckpt_dir = os.path.join(
-            data_dir, self._token_type, 'checkpoint_data', self._checkpoint_dir
-        )
-        if os.path.isdir(ckpt_dir):
-            self.vprint("CONSTRUCTING (LOCAL) CHECKPOINT_DIR FROM 'TOKEN_TYPE'")
-        else:
-            # ok, it's the whole path
-            self.vprint("USING USER-PROVIDED CHECKPOINT_DIR")
-            ckpt_dir = self._checkpoint_dir
-
         # update the SequenceNetwork's checkpoint_path as well!
-        self.net.checkpoint_path = os.path.join(ckpt_dir, 'model.ckpt')
-
-        return ckpt_dir
+        self.net.checkpoint_path = os.path.join(
+            self._checkpoint_dir, 'model.ckpt'
+        )
+        return self._checkpoint_dir
 
     @checkpoint_dir.setter
     def checkpoint_dir(self, checkpoint_dir):
@@ -165,29 +154,11 @@ class MultiSubjectTrainer:
 
     @property
     def model_description_dir(self):
-
-        # try interpreting the _checkpoint_dir as a subdir
-        dscp_dir = os.path.join(
-            data_dir, self._token_type, 'model_description',
-            self._model_description_dir
-        )
-        if os.path.isdir(dscp_dir):
-            self.vprint("CONSTRUCTING MODEL_DESCRIPTION_DIR FROM 'TOKEN_TYPE'")
-        else:
-            # ok, it's the whole path
-            self.vprint("USING USER-PROVIDED MODEL_DESCRIPTION_DIR")
-            dscp_dir = self._model_description_dir
-
-        return dscp_dir
+        return self._model_description_dir
 
     @model_description_dir.setter
     def model_description_dir(self, model_description_dir):
-
-        # set the shadow variable
         self._model_description_dir = model_description_dir
-
-        # make sure the self.net.checkpoint_path gets updated as well
-        self.model_description_dir
 
     @property
     def restore_epoch(self):
@@ -296,6 +267,7 @@ class MultiSubjectTrainer:
         # set up methods
         results_plotter.get_saliencies = self.get_saliencies
         results_plotter.get_encoder_embedding = self.get_encoder_embedding
+        results_plotter.get_internal_activations = self.get_internal_activations
         results_plotter.get_sequence_counters = \
             lambda threshold: subject.get_unique_target_lengths(
                 self.unique_targets_list, threshold
@@ -628,11 +600,9 @@ class MultiSubjectTrainer:
 
         # set up paths
         save_dir = self.model_description_dir
-        json_dir = experiment_manifest['json_dir']
         if extra_description:
             save_dir += ('_' + extra_description)
         model_description_path = os.path.join(save_dir, 'model_description.json')
-        block_breakdowns_path = os.path.join(json_dir, 'block_breakdowns.json')
         channels_read_path = subject.data_generator.channels_path
         channels_write_path = os.path.join(save_dir, 'channels.json')
         UTL_read_path = os.path.join(self.checkpoint_dir, 'unique_targets.pkl')
@@ -643,15 +613,12 @@ class MultiSubjectTrainer:
             file for file in os.listdir(self.checkpoint_dir)
             if 'model.ckpt-{0}.'.format(self.restore_epoch) in file]
 
-        # load block_breakdowns b/c we need both utterance_set and paradigm
-        with open(block_breakdowns_path, 'r') as f:
-            block_breakdowns = json.load(f, object_hook=str2int_hook)
-            block_dict = block_breakdowns[subject.subnet_id]
+        # ...
         data_partition_dict = {
             partition: {
                 **{
                     descriptor: list({
-                        block_dict[block][descriptor]
+                        subject._block_dict[block][descriptor]
                         for block in subject.block_ids[partition]})
                     for descriptor in experiment_manifest['block_descriptors']
                 },
@@ -820,6 +787,113 @@ class MultiSubjectTrainer:
         # then get that matrix
         return self.net.get_weights_as_numpy_array(
             embedding_name, self.restore_epoch)
+
+    ######
+    # You should make it easier to do what you do here.  E.g., there should be
+    #  a more general way to make an appropriate AssessmentTuple.
+    ######
+    def get_internal_activations(self):
+        # You should make these arguments--although that would require getting
+        #  some other things to work....
+        op_strings = [
+            'convolved_inputs',
+            'reversed_inputs',
+            'decimated_reversed_targets',
+            'final_RNN_state',
+        ]
+
+        # ...
+        subnet_params = self.ecog_subjects[-1]
+
+        class BriefAssessmentTuple(MutableNamedTuple):
+            __slots__ = ['initializer'] + op_strings
+
+        def assessment_data_fxn(num_epochs):
+            GPU_op_dict, CPU_op_dict, assessments = \
+                self.net._generate_oneshot_datasets(
+                    self.unique_targets_list, subnet_params, 0
+                )
+            brief_assessments = {
+                'validation': BriefAssessmentTuple(
+                    initializer=assessments['validation'].initializer,
+                    **{op_string: None for op_string in op_strings}
+                )
+            }
+            return GPU_op_dict, CPU_op_dict, brief_assessments
+
+        def assessment_net_builder(GPU_op_dict, CPU_op_dict):
+            with tf.variable_scope('seq2seq', reuse=tf.compat.v1.AUTO_REUSE):
+                # reverse and decimate encoder targets
+                _, get_targets_lengths = nn.sequences_tools(
+                    GPU_op_dict['encoder_targets'])
+                reverse_targets = tf.reverse_sequence(
+                    GPU_op_dict['encoder_targets'], get_targets_lengths,
+                    seq_axis=1, batch_axis=0)
+                decimate_reversed_targets = reverse_targets[
+                    :, 0::subnet_params.decimation_factor, :]
+
+                self.net._prepare_encoder_targets(
+                    GPU_op_dict, 0, subnet_params.decimation_factor)
+
+                with tf.compat.v1.variable_scope(
+                    'subnet_{}'.format(subnet_params.subnet_id,),
+                    reuse=tf.compat.v1.AUTO_REUSE
+                ):
+                    # reverse inputs
+                    _, get_lengths = nn.sequences_tools(tfh.hide_shape(
+                        GPU_op_dict['encoder_inputs']))
+                    reverse_inputs = tf.reverse_sequence(
+                        GPU_op_dict['encoder_inputs'], get_lengths,
+                        seq_axis=1, batch_axis=0)
+
+                    # convolve inputs
+                    convolve_reversed_inputs, _ = self.net._convolve_sequences(
+                        reverse_inputs, subnet_params.decimation_factor,
+                        subnet_params.data_manifests['encoder_inputs'].num_features,
+                        self.net.layer_sizes['encoder_embedding'], 0.0,
+                        'encoder_embedding', tower_name=''
+                    )
+
+                # get the encoder state
+                get_final_state, _, _, _, _ = self.net._encode_sequences(
+                    GPU_op_dict['encoder_inputs'], subnet_params, 0.0, 0.0,
+                    set_initial_ind=0)
+
+            # give names to these so you can recover them later
+            decimate_reversed_targets = tf.identity(
+                decimate_reversed_targets, 'assess_decimated_reversed_targets')
+            convolve_reversed_inputs = tf.identity(
+                convolve_reversed_inputs, 'assess_convolved_inputs')
+            reverse_inputs = tf.identity(
+                reverse_inputs, 'assess_reversed_inputs')
+            get_final_state = tf.identity(
+                get_final_state, 'assess_final_RNN_state')
+
+            # one day you will be able to get rid of these...
+            return None, None
+
+        def assessor(
+            sess, assessment_struct, epoch, assessment_step, data_partition
+        ):
+            sess.run(assessment_struct.initializer)
+            assessments = sess.run([
+                sess.graph.get_operation_by_name('assess_' + op_string).outputs[0]
+                for op_string in op_strings]
+            )
+            for op_string, assessment in zip(op_strings, assessments):
+                setattr(assessment_struct, op_string, assessment)
+
+            return assessment_struct
+
+        # use the general graph build to assemble these pieces
+        graph_builder = tfh.GraphBuilder(
+            None, assessment_data_fxn, None, assessment_net_builder, None,
+            assessor, self.net.checkpoint_path, self.restore_epoch,
+            self.restore_epoch-1, EMA_decay=self.net.EMA_decay,
+            assessment_GPU=self.net.assessment_GPU,
+        )
+
+        return graph_builder.assess()
 
 
 def construct_online_predictor(

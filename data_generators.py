@@ -184,15 +184,15 @@ class ECoGDataGenerator:
         size is (... x Nchannels),  not (... x Nelectrodes).
         '''
 
-        if self._good_electrodes is not None:
-            return self._good_electrodes
-        else:
+        if self._good_electrodes is None:
             # construct by first loading the *bad*channels
             with open(self.badchannels_path, 'r') as f:
                 bad_channels = f.readlines()
             bad_channels = [int(channel.strip()) for channel in bad_channels]
             return (set(range(np.prod(self.grid_size))) -
                     set(np.array(bad_channels)-1))
+        else:
+            return self._good_electrodes
 
     @good_electrodes.setter
     def good_electrodes(self, good_electrodes):
@@ -211,6 +211,9 @@ class ECoGDataGenerator:
         will be determined by the *elec_layout*.
         '''
 
+        # NB: this means that the electrodes are *not* in numerical order ('e1'
+        #  does not correspond to the 0th entry in all_electrodes): as you can
+        #  check, flattening the elec_layout does not yield an ordered list.
         all_electrodes = self.elec_layout.flatten().tolist()
 
         if self.USE_FIELD_POTENTIALS:

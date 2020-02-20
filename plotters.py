@@ -34,7 +34,6 @@ from ..utils_jgm.toolbox import cubehelix2params, pseudomode, wer_vector
 from ..utils_jgm.toolbox import auto_attribute
 from ..utils_jgm.toolbox import barplot_annotate_brackets
 from . import subjects as e2t_subjects
-from . import data_dir, tikz_dir, figs_dir
 from . import str2int_hook
 
 mpl.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}']
@@ -782,8 +781,7 @@ class ResultsPlotter:
             )
             mlab.options.offscreen = True
             if SAVE:
-                mlab.savefig(os.path.join(
-                    figs_dir, self.token_type, self.subject_name, 'anatomy.png'))
+                mlab.savefig(self.png_partial_path.format('anatomy'))
 
             return None, None
 
@@ -1193,6 +1191,8 @@ class ResultsPlotter:
             },
         )
 
+    ######################
+    # BROKEN
     def bar_plot_ecog_sequence_lengths(self, threshold=0.55):
 
         # save as:
@@ -1235,14 +1235,18 @@ class ResultsPlotter:
         # ax.set_title('length-based WER: %.1f' % WER*100)
 
         # save tikzpicture
-        tpl_save(filepath=os.path.join(self.tikz_partial_path.format(file_name)))
+        tpl_save(filepath=self.tikz_partial_path.format(file_name))
 
         return WER
+    ######################
 
-    def plot_schematic_figures(self, assessments):
+    def plot_schematic_figures(self):
         '''
         Plot example ECoG, convolutions, hidden encoder states, and predicted MFCCs
         '''
+
+        # ...
+        assessments = self.get_internal_activations()
 
         # shortcut notation
         N = self.subject.decimation_factor
@@ -1264,11 +1268,6 @@ class ResultsPlotter:
         # ...
         filter_color_name = 'green'
         filter_cmap_name = 'Greens'
-
-        # set path
-        tikz_partial_path = os.path.join(
-            tikz_dir, self.subject.data_generator.token_type,
-            self.subject_name, '{0}.tex')
 
         def signal_plotter(
             data, cmap_name, t0, tF, num_channels, decimation_factor, e0,
@@ -1307,7 +1306,7 @@ class ResultsPlotter:
                 )
                 ax.add_patch(rect)
                 ax.set_axis_off()
-                tpl_save(filepath=tikz_partial_path.format(fig_name))
+                tpl_save(filepath=self.tikz_partial_path.format(fig_name))
 
             # now set up the *current* figure
             fig = plt.figure()
@@ -1349,7 +1348,7 @@ class ResultsPlotter:
 
         # save the last figure
         ax.set_axis_off()
-        tpl_save(filepath=tikz_partial_path.format(fig_name))
+        tpl_save(filepath=self.tikz_partial_path.format(fig_name))
 
         # also plot encoder final state
         iFinal = 40
@@ -1359,7 +1358,7 @@ class ResultsPlotter:
         ax.bar(np.arange(data.shape[1]), np.squeeze(data), color='goldenrod')
         ax.set_axis_off()
         fig_name = 'hidden_state_example'
-        tpl_save(filepath=tikz_partial_path.format(fig_name))
+        tpl_save(filepath=self.tikz_partial_path.format(fig_name))
 
         # also plot (some) predicted MFCCs
         fig = plt.figure()
@@ -1372,7 +1371,7 @@ class ResultsPlotter:
             decimation_factor=decimation_factor, e0=0, e_offset=0, yticks=0
         )
         fig_name = 'predicted_MFCCs_example'
-        tpl_save(filepath=tikz_partial_path.format(fig_name))
+        tpl_save(filepath=self.tikz_partial_path.format(fig_name))
 
 
     ############
@@ -1562,9 +1561,9 @@ def plot_performance_vs_amount_of_training_data(
 ):
 
     # save as:
-    file_name = 'vs_{0}'.format(versus)
-    png_partial_path = get_save_path(figs_dir, plotters_list, file_name, 'png')
-    tikz_partial_path = get_save_path(tikz_dir, plotters_list, file_name, 'tex')
+    file_suffix = 'vs_{0}'.format(versus)
+    png_partial_path = get_save_path('png', plotters_list)
+    tikz_partial_path = get_save_path('tikz', plotters_list)
 
     # for each subject
     for plotter in plotters_list:
@@ -1643,7 +1642,8 @@ def plot_performance_vs_amount_of_training_data(
             axes.add_artist(subject_legend)
 
         tpl_save(
-            filepath=tikz_partial_path.format(performance_measure),
+            filepath=tikz_partial_path.format(
+                '_'.join([performance_measure, file_suffix])),
             extra_axis_parameters=extra_axis_parameters,
             extra_tikzpicture_parameters=extra_tikzpicture_parameters,
             extra_body_parameters=extra_body_parameters,
@@ -1662,8 +1662,8 @@ def plot_performance_vs_amount_of_training_data(
             axes.add_artist(line_style_legend)
 
         plt.savefig(
-            png_partial_path.format(performance_measure), bbox_inches='tight',
-            dpi=400
+            png_partial_path.format('_'.join([performance_measure, file_suffix])),
+            bbox_inches='tight', dpi=400
         )
         ##########
         # patch_thing = plt.gcf().get_children()[0]
@@ -1675,7 +1675,7 @@ def plot_performance_vs_amount_of_training_data(
 
 def plot_performance_with_all_data(
     plotters_list, performance_measures=['word_error_rate', 'accuracy'],
-    fig_num=0, file_name=None, y_major_ticks=None, ymin=0.0, ymax=100.0,
+    fig_num=0, file_suffix=None, y_major_ticks=None, ymin=0.0, ymax=100.0,
     title=None, comparisons=None, BOLD_FIRST_LABEL=False, BOXPLOT=False,
     VERBOSE=True
 ):
@@ -1687,9 +1687,9 @@ def plot_performance_with_all_data(
     floor = (barh + dh)*(ymax - ymin)
 
     # save as:
-    if file_name is None:
-        file_name = 'boxplot_all_data' if BOXPLOT else 'bar_all_data'
-    tikz_partial_path = get_save_path(tikz_dir, plotters_list, file_name, 'tex')
+    if file_suffix is None:
+        file_suffix = 'boxplot_all_data' if BOXPLOT else 'bar_all_data'
+    tikz_partial_path = get_save_path('tikz', plotters_list)
 
     # for each subject
     for iPlot, performance_measure in enumerate(performance_measures):
@@ -1795,7 +1795,8 @@ def plot_performance_with_all_data(
 
         # plt.tight_layout()
         tpl_save(
-            filepath=tikz_partial_path.format(performance_measure),
+            filepath=tikz_partial_path.format(
+                '_'.join([performance_measure, file_suffix])),
             extra_axis_parameters=extra_axis_parameters,
             extra_tikzpicture_parameters=extra_tikzpicture_parameters,
             # strict=True,
@@ -1856,30 +1857,17 @@ def boxplot_results_with_all_data(
     return ax
 
 
-def get_save_path(root_dir, plotters_list, file_name, extension):
+def get_save_path(fig_type, plotters_list):
 
-    # if all results are of the same token_type or subj_id, store there
-    subject_name = plotters_list[0].subject_name
+    # get the common path prefix
+    common_path = os.path.commonpath([
+        os.path.dirname(getattr(plotter, '{}_partial_path'.format(fig_type)))
+        for plotter in plotters_list
+    ])
 
-    # check if all results are of the same token_type
-    if len({r.token_type for r in plotters_list}) == 1:
-        subdir = plotters_list[0].token_type
-        # check if all results are of the same subject...
-        subsubdir = (
-            subject_name
-            if len({p.subject.subnet_id for p in plotters_list}) == 1
-            else ''
-        )
-    else:
-        subdir = ''
-        subsubdir = ''
-        # check if all results are of the same subject
-        if len({p.subject.subnet_id for p in plotters_list}) == 1:
-            file_name = subject_name + '_' + file_name
-        # else put all the subject names in there?
-
-    return os.path.join(
-        root_dir, subdir, subsubdir, '{0}_%s.%s' % (file_name, extension))
+    return os.path.join(common_path, os.path.basename(
+        getattr(plotters_list[0], '{}_partial_path'.format(fig_type))
+    ))
 
 
 def results_summarizer(summary_path, saved_results_partial_path, VERBOSE=True):
@@ -2146,18 +2134,16 @@ def project_grid_search(
 
 
 def all_grid_search_projections(
-    grid_shape, marginal_params, subj_id, token_type='word_sequence',
-    suffix=''
+    grid_shape, marginal_params, subj_id, saved_results_dir, suffix=''
 ):
     ######
     # Integrate with ResultsPlotter?
+    # NB that the saved_results_dir is in the manifest
     ######
 
     # load from file
-    saved_results_partial_dir = os.path.join(data_dir, '{0}', 'saved_results')
     loadfile_name = os.path.join(
-        saved_results_partial_dir.format(token_type),
-        'grid_search_{0}_conv_{1}_way{2}.hkl'.format(
+        saved_results_dir, 'grid_search_{0}_conv_{1}_way{2}.hkl'.format(
             subj_id, len(grid_shape), suffix)
     )
     with open(loadfile_name, 'r') as fp:
@@ -2253,7 +2239,7 @@ def print_latex_anatomical_legend():
 def cluster_embeddings(
     M, num_reduced_dims=2, num_mixture_components=3, POLAR=False,
     dimensionality_reducer='PCA', num_PCs_for_tSNE=50, data_labels=None,
-    file_name='word_embeddings'
+    fig_dir='', file_name='word_embeddings',
 ):
 
     # singular-value decomposition
@@ -2310,7 +2296,7 @@ def cluster_embeddings(
                     (*reduced_embedding[None, iLabel, :]),
                     xycoords="data", va="center", ha="center"
                 )
-    fig2.savefig(os.path.join(figs_dir, file_name))
+    fig2.savefig(os.path.join(fig_dir, file_name))
 
     return class_labels, reduced_embedding
 ########
