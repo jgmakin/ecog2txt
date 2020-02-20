@@ -8,22 +8,23 @@ This package contains Python code for the high-level aspects of decoding speech 
     ```
     pip install tensorflow-gpu=1.14.1
     ```
-If you don't have a GPU you should install the CPU version
+    If you don't have a GPU you should install the CPU version
     ```
     pip install tensorflow=1.14.1
     ```
-Please consult the Tensorflow installation documents.  The most important fact to know is that TF1.14 requires CUDA 10.0.
+    Please consult the Tensorflow installation documents.  The most important fact to know is that TF1.14 requires CUDA 10.0.
 
 2.  Install the three required packages:
     ```
     git clone https://github.com/jgmakin/utils_jgm.git
     pip install -e utils_jgm
 
+    git clone https://github.com/jgmakin/machine_learning.git
+    pip install -e machine_learning
+
     git clone https://github.com/jgmakin/ecog2txt.git
     pip install -e ecog2txt
 
-    git clone https://github.com/jgmakin/machine_learning.git
-    pip install -e machine_learning
     ```
 
 ## Getting started
