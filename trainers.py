@@ -2,12 +2,12 @@
 import pdb
 import os
 import re
-import yaml
 from functools import reduce
 from collections import defaultdict
 
 
 # third-party packages
+import yaml
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt

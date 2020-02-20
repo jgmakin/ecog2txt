@@ -13,13 +13,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/jgmakin/ecog2txt",
     packages=setuptools.find_packages(),
-    #packages=setuptools.find_packages(
-    #    exclude=[
-    #        'neural_models', 'robotics', 'toys',
-    #        'machine_learning.undirected_graphical_models',
-    #        '*exponential_families*'
-    #    ],
-    #),
     package_data={
         '': [
             'block_breakdowns.json',
@@ -36,11 +29,10 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'numpy', 'scipy', 'h5py', 'matplotlib', 'pandas', 'seaborn',
-        'tikzplotlib', 'tfmpl', 'tensor2tensor==1.14.1', 'hickle', 'pickle',
-        'python_speech_features', 'pyyaml', 'tensorflow-probability>=0.7',
-        'protobuf>=3.7',
+        'numpy', 'scipy', 'matplotlib', 'pandas', 'seaborn',
+        'tikzplotlib', 'tensor2tensor==1.14.1', 'hickle', 'pickle',
+        'python_speech_features', 'pyyaml', 'protobuf>=3.7',
+        'tensorflow-probability>=0.7',
         # 'samplerate', 'tensorflow-gpu==1.14'
-        # 'bamboo', 'RT'
     ],
 )
