@@ -6,4 +6,10 @@ This package contains Python code for the high-level aspects of decoding speech 
 ## Getting started
 In order to unify the vast set of parameters (paths, experimental block structure, neural network hyperparameters, etc.), all experiments are organized with the help of two configuration files, `block_breakdowns.json`, and `YOUR_EXPERIMENT_manifest.yaml`.  Examples of each are included in this repository.
 
-1.  Edit `example_experiment_manifest.yaml` to something sensible for your case.  In the very least, you should fix the paths.  Not every one is necessary for _training_ a network (e.g., the `png_partial_path` is only used for plotting)
+1.  Edit the `block_breakdowns.json` to match your use case.  The entries are
+  ```
+  SUBJECT_ID: {BLOCK: {"type: BLOCK_TYPE, "default_dataset": DEFAULT_DATASET_VALUE}}`
+  ```
+where the `DEFAULT_DATASET_VALUE` is one of `"training"/"validation"/"testing"`; and the `BLOCK_TYPE` is whatever descriptive title you want to give to your block (e.g., `"MOCHA-TIMIT"`).  In the `experiment_manifest.yaml`, these
+
+2.  Edit `example_experiment_manifest.yaml` to something sensible for your case.  In the very least, you should fix the paths.  Not every one is necessary for _training_ a network (e.g., the `png_partial_path` is only used for plotting), ...
