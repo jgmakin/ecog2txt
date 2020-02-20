@@ -25,7 +25,7 @@ In order to unify the vast set of parameters (paths, experimental block structur
       * `electrode_path`: you can ignore this unless you plan to plot results on the cortical surface (in which case contact me).
     * `block_types`: these set *necessary* conditions for membership in one of the datasets, `training/validation/testing`.  For example, in the `example_experiment_manifest.yaml`, the `testing` and `validation` sets are allowed to include only `mocha-1`, but the training set is allowed to include `mocha-1, ..., mocha-9`.  So if a `mocha-3` block has `validation` as its `"default_dataset"` in the `block_breakdowns.json`, it would be excluded altogether.
     * `grid_size`: Set this to match the dimensions of your ECoG grid.
-    * `vocab_file`: 
+    * `vocab_file`: You can provide a file with a list, one word per line, of all words to be targeted by the decoder.  This key specifies just the *name* of the file; the file itself must live in the `text_dir` specified in `__init__.py`.  If you set this key to `None`, the package will attempt to build a list of unique targets directly from the `TFRecord`s.  An example vocab_file, `vocab.mocha-timit.1806`, is included in this package.
     * `data_mapping`: Use this to set which data to use as inputs and outputs for the sequence-to-sequence network--see `_ecog_generator` below.  
     * `DataGenerator`: In the `example_experiment_manifest.yaml`, this points to the `ECoGDataGenerator` in `data_generators.py`, but you will probably want to subclass this class and point to your new (sub)class instead--see next item.
 
