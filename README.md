@@ -27,6 +27,13 @@ Place your edited copy into a directory we will call `json_dir`.
     * Additionally, if you want to allow blocks of a certain type (see previous item) to appear in one of the `training/validation/testing` sets, you need to fill in the `block_types` entry accordingly.  (For example, in the `example_experiment_manifest.yaml`, the `testing` and `validation` sets are allowed to include only `mocha-1`, but the training set is allowed to include `mocha-1, ..., mocha-9`.)
     * `grid_size`: set this to match the dimensions of your ECoG grid
     * `vocab_file`: 
-    * `DataGenerator`: see below.
+    * `DataGenerator`: In the `example_experiment_manifest.yaml`, this points to the `ECoGDataGenerator` in `data_generators.py`, but you will probably want to subclass this class and point to your new (sub)class instead--see next item.
 
     You can probably get away with leaving the rest of the values in the `.yaml` at their default values, at least for your first run.
+    
+    Finally, make sure your `experiment_manifest.yaml` lives at the `text_dir` specified in `__init__.py` (you can change this as you like).
+
+3. `ECoGDataGenerator`, found in `data_generators.py`, is a shell class for generating data that plays nicely with the other classes.  However, three of its (required!) methods are unspecified because they depened on how *you* store *your* data.  (Dummy versions appear in `ECoGDataGenerator`; you can inspect their input and outputs there.)  You should subclass `ECoGDataGenerator` and fill in these methods:
+    * `_get_wav_data`: should return the `sampling_rate` and audio `signal` for one (e.g.) block of audio data.  This will allow you to make use of the built-in `_get_MFCC_features` in constructing your `_ecog_generator` (see next).
+    * `_ecog_generator`: a Python generator that yields four data structures in the form of a `dict`: `ecog_sequence`,`text_sequence`, `audio_sequence`, and `phoneme_sequence`.  The last two are not strictly necessary for speech decoding and can be left out (or you can add more...).
+    * `_query`: should return the total number of examples in a group of blocks.  This will allow you to allocate memory efficiently when using the `get` method.  The methods `_query` and `get` are not used elsewhere in the code; they are convenience functions for examining the data directly rather than through a tf_record.
