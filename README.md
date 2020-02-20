@@ -58,10 +58,12 @@ trainer = e2t_trainers.MultiSubjectTrainer(
     DG_kwargs={
         'REFERENCE_BIPOLAR': True,  # overwriting whatever is in the manifest
     },
-    data_mapping = {                # overwriting whatever is in the manifest
-        'encoder_inputs': 'ecog_sequence',  
-        'decoder_targets': 'text_sequence',
-    }
+    ES_kwargs = {
+        'data_mapping': {           # overwriting whatever is in the manifest
+            'encoder_inputs': 'ecog_sequence',
+            'decoder_targets': 'text_sequence',
+        },
+    },
 )
 
 # MAKE SURE ALL THE TFRECORDS ARE WRITTEN
