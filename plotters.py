@@ -11,8 +11,6 @@ from cycler import cycler
 # third-party packages
 import numpy as np
 import hickle
-from sklearn.mixture import GaussianMixture
-from sklearn.manifold import TSNE
 from scipy.stats import t as students_t
 from scipy.stats import wilcoxon
 from scipy.io import loadmat
@@ -1419,8 +1417,8 @@ class ResultsPlotter():
                 subkey = (int(block_dict['blocks'][block_id]['type'].split('-')[-1])
                           if experiment == 'mocha-*' else 0)
                 subset_counters[data_partition][subkey] += sum(
-                    1 for _ in tf_record_iterator(os.path.join(
-                        tf_record_partial_path.format(block_id))))
+                    1 for _ in tf_record_iterator(
+                        tf_record_partial_path.format(block_id)))
 
         # now plot
         plt.figure()  # figsize=(2, 5))
@@ -2241,6 +2239,9 @@ def cluster_embeddings(
     dimensionality_reducer='PCA', num_PCs_for_tSNE=50, data_labels=None,
     fig_dir='', file_name='word_embeddings',
 ):
+
+    from sklearn.mixture import GaussianMixture
+    from sklearn.manifold import TSNE
 
     # singular-value decomposition
     Mcntrd = M - np.sum(M, axis=0, keepdims=True)/M.shape[0]

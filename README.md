@@ -4,7 +4,27 @@ Code for decoding speech as text from neural data
 This package contains Python code for the high-level aspects of decoding speech from neural data, including transfer learning across multiple subjects.  It was used to for all results in the paper "Machine translation of cortical activity to text with an encoder-decoder framework" (Makin et al., _Nature Neuroscience_, 2020).  These high-level aspects include the structuring of the training, the organization by subjects, and the construction of [`TFRecord`s](https://www.tensorflow.org/tutorials/load_data/tfrecord).  The (low-level) training itself is done with the adjacent [`machine_learning` package](https://github.com/jgmakin/machine_learning), which implements sequence-to-sequence networks in [TensorFlow](https://www.tensorflow.org).
 
 ## Installation
-...
+1.  Install [TensorFlow](https://www.tensorflow.org) 1.14.1.  (You may be tempted to install the final version of TF1, 1.15, but that will break things.)
+    ```
+    pip install tensorflow-gpu=1.14.1
+    ```
+If you don't have a GPU you should install the CPU version
+    ```
+    pip install tensorflow=1.14.1
+    ```
+Please consult the Tensorflow installation documents.  The most important fact to know is that TF1.14 requires CUDA 10.0.
+
+2.  Install the three required packages:
+    ```
+    git clone https://github.com/jgmakin/utils_jgm.git
+    pip install -e utils_jgm
+
+    git clone https://github.com/jgmakin/ecog2txt.git
+    pip install -e ecog2txt
+
+    git clone https://github.com/jgmakin/machine_learning.git
+    pip install -e machine_learning
+    ```
 
 ## Getting started
 In order to unify the vast set of parameters (paths, experimental block structure, neural-network hyperparameters, etc.), all experiments are organized with the help of two configuration files, `block_breakdowns.json`, and `YOUR_EXPERIMENT_manifest.yaml`.  Examples of each are included in this repository.
@@ -31,7 +51,7 @@ In order to unify the vast set of parameters (paths, experimental block structur
 
     You can probably get away with leaving the rest of the values in the `.yaml` at their default values, at least for your first run.
     
-    Finally, make sure your `experiment_manifest.yaml` lives at the `text_dir` specified in `__init__.py` (you can change this as you like).
+    Finally, make sure your `experiment_manifest.yaml` lives at the `text_dir` specified in `__init__.py` (you can change this as you like, but remember that the `vocab_file` must live in the same directory).
 
 3. `ECoGDataGenerator`, found in `data_generators.py`, is a shell class for generating data--in more particularly for writing out the `TFRecords` that will be used for training and assessing your model--that plays nicely with the other classes.  However, three of its (required!) methods are unspecified because they depend on how *you* store *your* data.  (Dummy versions appear in `ECoGDataGenerator`; you can inspect their input and outputs there.)  You should subclass `ECoGDataGenerator` and fill in these methods:
     * `_ecog_token_generator`: a Python generator that yields data structures in the form of a `dict`, each entry of which corresponds to a set of inputs and outputs on a single trial.  For example, the entries might be `ecog_sequence`,`text_sequence`, `audio_sequence`, and `phoneme_sequence`.  The last two are not strictly necessary for speech decoding and can be left out--or you can add more.  Just *make sure that you return at least the data structures requested in the `data_mapping` specified in the `manifest`*.  So e.g. if the `data_mapping` is
