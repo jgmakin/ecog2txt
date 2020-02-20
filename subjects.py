@@ -59,14 +59,15 @@ class ECoGSubject:
 
         Other attributes include:
             data_generators             (for generating data!)
-            _block_types                (for constructing block_ids)
+            block_types                 (for constructing block_ids)
             pretrain_all_blocks         (for constructing block_ids)
         '''
 
         # get the block_breakdowns
         json_dir = manifest['json_dir']
         with open(os.path.join(json_dir, 'block_breakdowns.json')) as f:
-            self.block_breakdowns = json.load(f, object_hook=str2int_hook)[subj_id]
+            block_breakdowns = json.load(f, object_hook=str2int_hook)[subj_id]
+        self._block_dict = block_breakdowns
 
         # these attributes will *not* be accessed by a SequenceNet
         DataGenerator = manifest['DataGenerator']
