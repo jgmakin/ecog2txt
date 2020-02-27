@@ -20,12 +20,6 @@ TOKEN_TYPES = {
 }
 DATA_PARTITIONS = {'training', 'validation', 'testing'}
 
-
-# functions
-def str2int_hook(d):
-    return {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()}
-
-
 # useful linguistic things
 consonant_dict = {
     'phoneme': [

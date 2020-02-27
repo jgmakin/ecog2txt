@@ -29,10 +29,9 @@ import tikzplotlib as tpl
 from ..machine_learning.neural_networks import tf_helpers as tfh
 from ..utils_jgm.tikz_pgf_helpers import tpl_save
 from ..utils_jgm.toolbox import cubehelix2params, pseudomode, wer_vector
-from ..utils_jgm.toolbox import auto_attribute
+from ..utils_jgm.toolbox import auto_attribute, str2int_hook
 from ..utils_jgm.toolbox import barplot_annotate_brackets
 from . import subjects as e2t_subjects
-from . import str2int_hook
 
 mpl.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}']
 #mpl.rcParams['text.usetex'] = True

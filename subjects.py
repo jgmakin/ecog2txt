@@ -9,10 +9,9 @@ import numpy as np
 import tensorflow as tf
 
 # local
-from ..utils_jgm.toolbox import wer_vector
-from ..utils_jgm.toolbox import auto_attribute
+from ..utils_jgm.toolbox import wer_vector, auto_attribute, str2int_hook
 from ..machine_learning.neural_networks import tf_helpers as tfh
-from . import str2int_hook, EOS_token, pad_token, OOV_token, DATA_PARTITIONS
+from . import EOS_token, pad_token, OOV_token, DATA_PARTITIONS
 
 
 '''
