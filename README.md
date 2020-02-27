@@ -1,7 +1,7 @@
 # ecog2txt
 Code for decoding speech as text from neural data
 
-This package contains Python code for the high-level aspects of decoding speech from neural data, including transfer learning across multiple subjects.  It was used to for all results in the paper "Machine translation of cortical activity to text with an encoder-decoder framework" (Makin et al., _Nature Neuroscience_, 2020).  These high-level aspects include the structuring of the training, the organization by subjects, and the construction of [`TFRecord`s](https://www.tensorflow.org/tutorials/load_data/tfrecord).  The (low-level) training itself is done with the adjacent [`machine_learning` package](https://github.com/jgmakin/machine_learning), which implements sequence-to-sequence networks in [TensorFlow](https://www.tensorflow.org).
+This package contains Python code for the high-level aspects of decoding speech from neural data, including transfer learning across multiple subjects.  It was used for all results in the paper "Machine translation of cortical activity to text with an encoder-decoder framework" (Makin et al., _Nature Neuroscience_, 2020).  These high-level aspects include the structuring of the training, the organization by subjects, and the construction of [`TFRecord`s](https://www.tensorflow.org/tutorials/load_data/tfrecord).  The (low-level) training itself is done with the adjacent [`machine_learning` package](https://github.com/jgmakin/machine_learning), which implements sequence-to-sequence networks in [TensorFlow](https://www.tensorflow.org).
 
 ## Installation
 1.  Install [TensorFlow](https://www.tensorflow.org) 1.14.1.  (You may be tempted to install the final version of TF1, 1.15, but that will break things.)
