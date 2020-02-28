@@ -97,7 +97,7 @@ class ECoGSubject:
     # ATTRIBUTES THAT *WILL* BE ACCESSED BY A SequenceNet
     @property
     def subnet_id(self):
-        return self.data_generator.subj_id
+        return self.subj_id
 
     @property
     def block_ids(self):

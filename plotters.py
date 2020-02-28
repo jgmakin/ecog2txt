@@ -1,6 +1,7 @@
 import os
 import pdb
 import re
+from functools import reduce
 import json
 import copy
 import itertools
@@ -128,6 +129,7 @@ class ResultsPlotter():
         tikz_partial_path=None,
         png_partial_path=None,
         anatomy_grand_list=None,
+        grid_names=None
         #####
     ):
 
@@ -331,17 +333,23 @@ class ResultsPlotter():
                 self.vprint('No elec data found; setting anatomy_labels to None')
                 return None
             else:
-                # Construct a map from electrode number to anatomical label.
-                # NB the hack that discards superior grids.  (In the patient(s)
-                # for whom this arises, the superior grid is not used--but it
-                # has the same numbering as the inferior grid, 1-128.)
+                # For each grid_name, construct a map from electrode number to
+                #  anatomical label.
                 electrode_data = loadmat(self.electrode_path)
-                electrode_to_anatomy_map = {
+                electrode_to_anatomy_maps = [{
                     int(re.findall(r'\d+', label[1][0])[-1]) - 1: anat[3][0]
                     for label, anat in zip(
                         electrode_data['eleclabels'], electrode_data['anatomy'])
-                    if str(label[2][0]) == 'grid' if 'Superior' not in label[1][0]
-                }
+                    if str(label[1][0]).startswith(grid_name)
+                } for grid_name in self.grid_names]
+
+                # combine the maps, augmenting nominal electrode number by the
+                #  number of electrodes already in the combined map.
+                electrode_to_anatomy_map = reduce(
+                    lambda x, y: {**x, **{key+len(x): value for key, value in y.items()}},
+                    electrode_to_anatomy_maps
+                )
+
                 # Unfortunately, the stored anatomy labels for some subjects
                 #  are defined wrt a *standard* grid.  We have to adjust for
                 #  that here.  If the elec_layout matches the std_elec_layout,
