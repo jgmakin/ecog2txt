@@ -32,6 +32,7 @@ from ..utils_jgm.tikz_pgf_helpers import tpl_save
 from ..utils_jgm.toolbox import cubehelix2params, pseudomode, wer_vector
 from ..utils_jgm.toolbox import auto_attribute, str2int_hook
 from ..utils_jgm.toolbox import barplot_annotate_brackets
+from ..utils_jgm.toolbox import anti_alias
 from . import subjects as e2t_subjects
 
 mpl.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}']
@@ -2389,26 +2390,3 @@ def effect_of_tabularizer(summary_dict):
                 print('           & effect size & ' + ' & '.join(effect_sizes)
                       + hline)
     print('\\end{tabular}')
-
-
-def anti_alias(data, F_sampling, F_high, F_transition, atten_DB):
-    import scipy.signal as signal
-
-    F_nyquist = F_sampling/2
-
-    # The fred harris rule of thumb:
-    #   N = [(fs)/delta(f)]∗[atten(dB)/22]
-    #   https://dsp.stackexchange.com/questions/37646
-    # But you run filtfilt, which effectively doubles the order, so only
-    #   need N/2
-    N = (F_sampling/F_transition*atten_DB/22)/2
-    # N = 2**int(np.ceil(np.log2(N)))  # use a power of 2
-    N = 2*int(N//2) + 1  # use odd number
-
-    # filter forwards and backwards
-    desired = (1, 1, 0, 0)
-    bands = (0, F_high, F_high+F_transition, F_nyquist)
-    fir_firls = signal.firls(N, bands, desired, fs=F_sampling)
-    for iElectrode, raw_signal in enumerate(data.T):
-        data[:, iElectrode] = signal.filtfilt(fir_firls, 1, raw_signal)
-    return data

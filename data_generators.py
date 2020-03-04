@@ -1,7 +1,6 @@
 # standard libraries
 import pdb
 import os
-import json
 
 # third-party packages
 import numpy as np
