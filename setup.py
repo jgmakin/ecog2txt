@@ -14,10 +14,10 @@ setuptools.setup(
     url="https://github.com/jgmakin/ecog2txt",
     packages=setuptools.find_packages(),
     package_data={
-        '': [
-            'block_breakdowns.json',
-            'example_experiment_manifest.yaml',
-            'vocab.mocha-timit.1806',
+        'ecog2txt': [
+            'auxiliary/block_breakdowns.json',
+            'auxiliary/example_experiment_manifest.yaml',
+            'auxiliary/vocab.mocha-timit.1806',
         ]
     },
     classifiers=[
