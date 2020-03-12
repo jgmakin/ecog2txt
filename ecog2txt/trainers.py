@@ -17,15 +17,14 @@ from tensorflow.python import pywrap_tensorflow
 from tensorflow.python.tools.inspect_checkpoint import print_tensors_in_checkpoint_file
 
 # local
-from ..utils_jgm.toolbox import heatmap_confusions, MutableNamedTuple
-from ..machine_learning.neural_networks import sequence_networks
-from ..machine_learning.neural_networks import tf_helpers as tfh
-from ..machine_learning.neural_networks import basic_components as nn
-
-from .subjects import ECoGSubject
-from . import plotters
-from . import text_dir
-from . import EOS_token, pad_token, OOV_token, TOKEN_TYPES, DATA_PARTITIONS
+from utils_jgm.toolbox import heatmap_confusions, MutableNamedTuple
+from machine_learning.neural_networks import sequence_networks
+from machine_learning.neural_networks import tf_helpers as tfh
+from machine_learning.neural_networks import basic_components as nn
+from ecog2txt.subjects import ECoGSubject
+from ecog2txt import plotters
+from ecog2txt import text_dir, TOKEN_TYPES, DATA_PARTITIONS
+from ecog2txt import EOS_token, pad_token, OOV_token
 
 
 '''

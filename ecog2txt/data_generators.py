@@ -13,9 +13,9 @@ except ModuleNotFoundError:
     pass
 
 # local
-from ..machine_learning.neural_networks import tf_helpers as tfh
-from ..utils_jgm.toolbox import auto_attribute
-from . import text_dir
+from machine_learning.neural_networks import tf_helpers as tfh
+from utils_jgm.toolbox import auto_attribute
+from ecog2txt import text_dir
 
 
 ''''
