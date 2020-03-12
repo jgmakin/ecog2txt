@@ -24,7 +24,6 @@ if os.name == 'posix' and "DISPLAY" not in os.environ:
     mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import tikzplotlib as tpl
 
 # local
 from ..machine_learning.neural_networks import tf_helpers as tfh
@@ -331,8 +330,10 @@ class ResultsPlotter():
             return self._anatomy_labels
         else:
             if not os.path.isfile(self.electrode_path):
-                self.vprint('No elec data found; setting anatomy_labels to None')
-                return None
+                self.vprint('No elec data found; setting ', end='')
+                self.vprint('anatomy_labels to first anatomical area')
+                return self.ordered_good_electrodes.shape[0]*[
+                    self.anatomy_grand_list[0]]
             else:
                 # For each grid_name, construct a map from electrode number to
                 #  anatomical label.
@@ -741,9 +742,18 @@ class ResultsPlotter():
 
     def scatter_electrode_contributions(
         self, plot_style='no brain', LABEL=False, SAVE=True, suffix='',
-        axis=None
+        axis=None, max_marker_size=None
     ):
         from palettable.colorbrewer import qualitative
+
+        # via trial and error...
+        style_to_max_marker_map = {
+            'on brain': 0.3,  # 0.2
+            'no brain': 35,
+            'flat': 650
+        }
+        if max_marker_size is None:
+            max_marker_size = style_to_max_marker_map(plot_style)
 
         # save as:
         figure_name = 'electrode_locations' + suffix
@@ -752,8 +762,10 @@ class ResultsPlotter():
         elec_color_scheme = getattr(
             qualitative, 'Set3_%i' % len(self.anatomy_grand_list))
         cmap = elec_color_scheme.mpl_colormap
-        good_color_ids = [self.anatomy_grand_list.index(label)
-                          for label in self.anatomy_labels]
+        good_color_ids = [
+            self.anatomy_grand_list.index(label)
+            for label in self.anatomy_labels
+        ]
 
         # set the legend
         unique_color_ids = set(good_color_ids)
@@ -762,8 +774,6 @@ class ResultsPlotter():
         legend_labels = [self.anatomy_grand_list[i] for i in unique_color_ids]
 
         def scatter_on_brain():
-            # via trial and error...
-            max_marker_size = 0.3  # 0.2
 
             from img_pipe import img_pipe
             patient = img_pipe.freeCoG(subj=self.subject_name, hem=self.hemisphere)
@@ -792,9 +802,6 @@ class ResultsPlotter():
             return None, None
 
         def scatter_no_brain():
-            # via trial and error...
-            max_marker_size = 35
-
             # ...
             fig = plt.figure(figsize=(5, 5), dpi=150)
             ax = fig.gca(projection='3d')
@@ -822,9 +829,6 @@ class ResultsPlotter():
             return fig, ax
 
         def scatter_flat():
-            # trial and error
-            max_marker_size = 650
-
             # scatter
             if axis is None:
                 fig, ax = plt.subplots(
@@ -881,6 +885,7 @@ class ResultsPlotter():
             'no brain': scatter_no_brain,
             'flat': scatter_flat
         }
+
         return style_to_fxn_map[plot_style]()
 
     def animate_electrode_contributions(self, iExample=0):
@@ -1469,8 +1474,8 @@ class ResultsPlotter():
         extra_tikzpicture_parameters = {
                 '\\providecommand{\\thisYlabelopacity}{1.0}'
         }
-        tpl.save(
-            self.tikz_partial_path.format('data_distribution'),
+        tpl_save(
+            filepath=self.tikz_partial_path.format('data_distribution'),
             extra_axis_parameters=extra_axis_parameters,
             extra_tikzpicture_parameters=extra_tikzpicture_parameters
         )
