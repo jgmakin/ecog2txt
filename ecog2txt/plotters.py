@@ -546,7 +546,9 @@ class ResultsPlotter():
             SUBSAMPLE=False, OCCLUDE=False)
 
         # init
-        WERs_list = [[] for ind in range(self.subject.data_generator.num_channels)]
+        WERs_list = [
+            [] for ind in range(self.subject.data_generator.num_ECoG_channels)
+        ]
 
         # for all WERs, collect up the corresponding masked electrodes
         for start, wer in zip(
@@ -597,8 +599,8 @@ class ResultsPlotter():
                     input_mask.start = [start_i, start_j]
                     self.trainer.net.inputs_to_occlude = input_mask.subgrid_inds
                     assessments = self.trainer.net.restore_and_assess(
-                        self.trainer.unique_targets_list, self.trainer.ecog_subjects,
-                        self.trainer.restore_epoch, WRITE=False)
+                        self.trainer.ecog_subjects, self.trainer.restore_epoch,
+                        WRITE=False)
 
                     for ind in input_mask.subgrid_inds:
                         WERs_list[ind].append(assessments['validation'].word_error_rate)
@@ -1212,8 +1214,7 @@ class ResultsPlotter():
         # create a sequence counter
         ######################
         sequence_counters = self.trainer.ecog_subjects[
-            -1].get_unique_target_lengths(
-                self.trainer.unique_targets_list, threshold)
+            -1].get_unique_target_lengths(threshold)
         ######################
 
         # classify based on length alone, and compute resulting WER
@@ -1489,9 +1490,6 @@ class ResultsPlotter():
         return None
 
     def get_encoder_embedding(self):
-        return None
-
-    def get_sequence_counters(self):
         return None
 
 

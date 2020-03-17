@@ -75,8 +75,8 @@ class ECoGSubject:
         # these attribute *will* be accessed by a SequenceNet
         self.target_specs = dict(target_specs)
         self.data_manifests = {
-            key: SequenceDataManifest(sequence_type)
-            for key, sequence_type in self.data_mapping.items()
+            data_key: SequenceDataManifest(sequence_type)
+            for data_key, sequence_type in self.data_mapping.items()
         }
 
     # ATTRIBUTES THAT WILL *NOT* BE ACCESSED BY A SequenceNet
@@ -149,46 +149,44 @@ class ECoGSubject:
 
     @property
     def data_manifests(self):
+        # The sequence_types 'ecog_sequence' and 'audio_sequence' are special:
+        #  their sizes are linked to properties of this data generator.  The
+        #  others are assumed to be text or anyway sensibly stored in a list.
+        #  If other, non-text sequence_types are added, this preallocation
+        #  should be adjusted accordingly.
+
         for data_manifest in self._data_manifests.values():
             if data_manifest.sequence_type == 'ecog_sequence':
-                data_manifest.num_features = self.data_generator.num_channels
-            elif data_manifest.sequence_type == 'text_sequence':
-                # unfortunately, the ingredients to set this aren't here
-                pass
+                data_manifest.num_features = \
+                    self.data_generator.num_ECoG_channels
             elif data_manifest.sequence_type == 'audio_sequence':
                 data_manifest.num_features = \
                     self.data_generator.num_MFCC_features
-            elif data_manifest.sequence_type == 'phoneme_sequence':
-                # unfortunately, the ingredients to set this aren't here
-                pass
             else:
-                raise ValueError('unexpected data_manifest sequence_type')
+                pass
 
         return self._data_manifests
-
-    def unique_targets_list(self):
-        print('inside UTL')
-        return []
 
     @data_manifests.setter
     def data_manifests(self, data_manifests):
         self._data_manifests = data_manifests
 
     def write_tf_records_maybe(
-        self, data_partitions=DATA_PARTITIONS, data_key='decoder_targets'
+        self, sequence_type=None, data_partitions=DATA_PARTITIONS
     ):
-        # NB: if there is a vocab_file, then it doesn't matter what the
-        #  manifest data_key is set to: the contents of the vocab_file will be
-        #  returned as the UTL no matter what.
+        # by default, provide the classes associated with the decoder_targets
+        if sequence_type is None:
+            sequence_type = self.data_manifests['decoder_targets'].sequence_type
+
+        # Note that these class_list are overwriting each other: only the
+        #  one associated with the final data_partition is returned
         for data_partition in data_partitions:
-            UTL = self.data_generator.write_to_Protobuf_maybe(
-                self.block_ids[data_partition],
-                self.data_manifests[data_key].sequence_type)
+            class_list = self.data_generator.write_to_Protobuf_maybe(
+                sequence_type, self.block_ids[data_partition],
+            )
+        return class_list
 
-        # only return the UTL from the *last* data_partition
-        return UTL
-
-    def count_targets(self, unique_targets_list, threshold=0.4):
+    def count_targets(self, unique_targets, threshold=0.4):
 
         # initialize
         target_counters = {}
@@ -202,7 +200,7 @@ class ECoGSubject:
         # for each data_partition...
         for data_partition, blocks in self.block_ids.items():
             # build two counters and apply them to *all* examples
-            target_counter = TargetCounter(unique_targets_list)
+            target_counter = TargetCounter(unique_targets)
             sequence_counter = SequenceCounter(unique_sequences, threshold)
             apply_to_all_tf_examples(
                 [target_counter, sequence_counter],
@@ -234,7 +232,7 @@ class ECoGSubject:
 
         return target_counters, sequence_counters
 
-    def get_unique_target_lengths(self, unique_targets_list, threshold=0.4):
+    def get_unique_target_lengths(self, threshold=0.4):
 
         # initialize
         sequence_counters = {}
@@ -288,10 +286,10 @@ class SequenceDataManifest:
 
     @property
     def feature_value(self):
-        if self.sequence_type in ['text_sequence', 'phoneme_sequence']:
-            return tf.io.VarLenFeature(tf.string)
-        else:
+        if self.sequence_type in ['ecog_sequence', 'audio_sequence']:
             return tf.io.VarLenFeature(tf.float32)
+        else:
+            return tf.io.VarLenFeature(tf.string)
 
     @property
     def num_features(self):
@@ -363,15 +361,17 @@ class SequenceDataManifest:
         if self._distribution is not None:
             return self._distribution
         else:
-            if self.sequence_type in ['text_sequence', 'phoneme_sequence']:
-                return 'categorical'
-            elif self.sequence_type == 'ecog_sequence':
+            if self.sequence_type == 'ecog_sequence':
                 # but you probably don't care about the ECoG distribution...
                 return 'Rayleigh'
             elif self.sequence_type == 'audio_sequence':
                 return 'Gaussian'
             else:
-                return 'Gaussian'
+                return 'categorical'
+
+    @distribution.setter
+    def distribution(self, distribution):
+        self._distribution = distribution
 
     @property
     def padding_value(self):
@@ -392,10 +392,6 @@ class SequenceDataManifest:
     @padding_value.setter
     def padding_value(self, padding_value):
         self._padding_value = padding_value
-
-    @distribution.setter
-    def distribution(self, distribution):
-        self._distribution = distribution
 
 
 ################
@@ -481,10 +477,10 @@ class TargetCounter:
     @auto_attribute
     def __init__(
         self,
-        unique_targets_list,
+        unique_targets,
     ):
         # the dictionary that will be updated
-        self.types = np.zeros(len(unique_targets_list), dtype=int)
+        self.types = np.zeros(len(unique_targets), dtype=int)
         self.skipped_tokens = 0
         self.examples = 0
 
@@ -499,7 +495,7 @@ class TargetCounter:
         # for all entries (probably words) in this list
         for entry in sequence:
             try:
-                self.types[self.unique_targets_list.index(entry)] += 1
+                self.types[self.unique_targets.index(entry)] += 1
             except ValueError:
                 self.skipped_tokens += 1
 

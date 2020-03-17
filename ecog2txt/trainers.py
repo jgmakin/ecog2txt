@@ -39,13 +39,12 @@ class MultiSubjectTrainer:
         subject_ids,
         checkpoint_dir='',
         restore_epoch=None,
-        unique_targets_list=None,
-        unique_encoder_targets_list=None,
         SN_kwargs=(),
         DG_kwargs=(),
         RP_kwargs=(),
         ES_kwargs=(),
-        VERBOSE=True
+        VERBOSE=True,
+        **kwargs
     ):
 
         # load the experiment_manifest
@@ -91,44 +90,77 @@ class MultiSubjectTrainer:
         self.VERBOSE = VERBOSE
         self.checkpoint_dir = checkpoint_dir
         self.restore_epoch = restore_epoch
-        self.unique_targets_list = unique_targets_list
-        self.unique_encoder_targets_list = unique_encoder_targets_list
 
+        # update the data_manifests for our case
         for subject in self.ecog_subjects:
-
-            # adjust data_manifests for the specifics of this experiment
-            for key, data_manifest in subject.data_manifests.items():
-                # see if the experiment_manifest specifies a penalty_scale
-                seq_type = data_manifest.sequence_type
+            for data_key, data_manifest in subject.data_manifests.items():
                 try:
                     data_manifest.penalty_scale = self.experiment_manifest[
-                        subject.subnet_id][seq_type + '_penalty_scale']
+                        subject.subnet_id][data_key + '_penalty_scale']
                 except KeyError:
                     pass
-
-                # the decoder targets are the unique_targets_list
-                if key == 'decoder_targets':
-                    data_manifest.get_feature_list = (
-                        lambda: self.unique_targets_list
-                    )
-
-                # if the encoder_targets are text...
-                if (
-                    key == 'encoder_targets' and
-                    seq_type in ['phoneme_sequence', 'text_sequence']
-                ):
-                    # ...then then are in the unique_encoder_targets_list
-                    data_manifest.get_feature_list = (
-                        lambda: self.unique_encoder_targets_list
-                    )
-
-                else:
-                    # there are other conceivable possibilities...
-                    pass
+        self.set_feature_lists(**kwargs)
 
     def vprint(self, *args, **kwargs):
         if self.VERBOSE:
             print(*args, **kwargs)
+
+    def set_feature_lists(self, **kwargs):
+        for subject in self.ecog_subjects:
+
+            # adjust data_manifests for the specifics of this experiment
+            for data_key, data_manifest in subject.data_manifests.items():
+                sequence_type = data_manifest.sequence_type
+
+                # for categorical data, set get_feature_list
+                if data_manifest.distribution == 'categorical':
+
+                    # useful string constants derived from the sequence_type
+                    vocab_list_name = '_'.join([sequence_type, 'vocab_list'])
+                    vocab_file_path = subject.data_generator.sequence_type_to_vocab_file_path(
+                        sequence_type)
+                    vocab_pkl_path = os.path.join(
+                        self.checkpoint_dir, '_'.join([sequence_type, 'vocab_file.pkl'])
+                    )
+
+                    self.vprint(
+                        'Setting feature_list for %s to ' % data_key, end=''
+                    )
+
+                    # explicit vocab_list has priority 1
+                    if vocab_list_name in kwargs:
+                        self.vprint("argument pased w/key %s" % vocab_list_name)
+                        class_list = kwargs[vocab_list_name]
+
+                    # saved vocab_file has priority 2
+                    elif vocab_file_path is not None:
+                        self.vprint("vocab list stored in %s" % vocab_file_path)
+                        class_list = subject.data_generator.get_class_list(
+                            sequence_type
+                        )
+
+                    # a pickled vocab file has priority 3
+                    elif os.path.isfile(vocab_pkl_path):
+                        self.vprint("vocab list stored in %s" % vocab_pkl_path)
+                        with open(vocab_pkl_path, 'rb') as fp:
+                            bytes_list = pickle.load(fp)
+                        class_list = [t.decode('utf-8') for t in bytes_list]
+
+                    # none of the above, yet the data are still categorical
+                    else:
+                        self.vprint("training-intersection/validation-union")
+                        class_list = self._training_intersection_validation_union(
+                            sequence_type, [pad_token, EOS_token, OOV_token]
+                            # ([pad_token, EOS_token, OOV_token]
+                            #  if 'sequence' in self._token_type else
+                            #  [OOV_token])
+                        )
+
+                    # ...
+                    data_manifest.get_feature_list = lambda: class_list
+                else:
+                    # don't do anything for non-categorical data
+                    pass
 
     @property
     def checkpoint_dir(self):
@@ -172,79 +204,6 @@ class MultiSubjectTrainer:
         self._restore_epoch = restore_epoch
 
     @property
-    def unique_targets_list(self):
-        '''
-        Priority order:
-            (1) UTL passed as argument or set as attribute
-            (2) UTL constructed from vocab_file passed or set
-            (3) UTL loaded from 'unique_targets.pkl' in the checkpoint_dir
-            (4) UTL constructed by union of: the intersection (across subjects)
-                of training data and the union (across subjects) of validation
-                data
-        '''
-
-        UTL_path = os.path.join(self.checkpoint_dir, 'unique_targets.pkl')
-
-        if self._unique_targets_list:
-            self.vprint('USING _UNIQUE_TARGETS_LIST')
-            UTL = self._unique_targets_list
-        elif self.ecog_subjects[-1].data_generator.vocab_file:
-            # as long as the final subject has a path to a vocab file, use it
-            self.vprint('CONSTRUCTING UNIQUE_TARGETS_LIST FROM VOCAB_FILE')
-            UTL = self.ecog_subjects[-1].data_generator.get_unique_targets()
-        elif os.path.isfile(UTL_path):
-            self.vprint('LOADING UNIQUE_TARGETS_LIST FROM PICKLE FILE')
-            with open(UTL_path, 'rb') as fp:
-                unique_bytes_list = pickle.load(fp)
-            UTL = [t.decode('utf-8') for t in unique_bytes_list]
-        else:
-            self.vprint('CONSTRUCTING UNIQUE_TARGETS_LIST VIA ', end='')
-            self.vprint('TRAINING/INTERSECTION, VALIDATION/UNION')
-            UTL = self._training_intersection_validation_union(
-                'decoder_targets',
-                ([pad_token, EOS_token, OOV_token]
-                 if 'sequence' in self._token_type else
-                 [OOV_token])
-            )
-        self.vprint('There are %i unique token types' % len(UTL))
-
-        if 'sequence' in self._token_type:
-            assert EOS_token in UTL, "Sequence data require an EOS_token"
-            assert pad_token in UTL, "Sequence data require a pad_token"
-
-        # You don't want to have to keep re-acquiring this list, so store
-        #  it here.  If you do want to re-calculate it, set it to None.
-        self._unique_targets_list = UTL
-
-        return UTL
-
-    @unique_targets_list.setter
-    def unique_targets_list(self, unique_targets_list):
-        self._unique_targets_list = unique_targets_list
-
-    @property
-    def unique_encoder_targets_list(self):
-        if self._unique_encoder_targets_list:
-            self.vprint('USING _UNIQUE_ENCODER_TARGETS_LIST')
-            UETL = self._unique_encoder_targets_list
-        else:
-            self.vprint('CONSTRUCTING UNIQUE_ENCODER_TARGETS_LIST VIA', end='')
-            self.vprint(' TRAINING/INTERSECTION, VALIDATION/UNION')
-            UETL = self._training_intersection_validation_union(
-                'encoder_targets', [pad_token])
-        self.vprint('There are %i unique phonemes' % len(UETL))
-
-        # You don't want to have to keep re-acquiring this list, so store
-        #  it here.  If you do want to re-calculate it, set it to None.
-        self._unique_encoder_targets_list = UETL
-
-        return UETL
-
-    @unique_encoder_targets_list.setter
-    def unique_encoder_targets_list(self, unique_encoder_targets_list):
-        self._unique_encoder_targets_list = unique_encoder_targets_list
-
-    @property
     def results_plotter(self):
         subject = self.ecog_subjects[-1]
         results_plotter = plotters.ResultsPlotter(
@@ -256,10 +215,6 @@ class MultiSubjectTrainer:
         results_plotter.get_saliencies = self.get_saliencies
         results_plotter.get_encoder_embedding = self.get_encoder_embedding
         results_plotter.get_internal_activations = self.get_internal_activations
-        results_plotter.get_sequence_counters = \
-            lambda threshold: subject.get_unique_target_lengths(
-                self.unique_targets_list, threshold
-            )
 
         return results_plotter
 
@@ -278,8 +233,7 @@ class MultiSubjectTrainer:
             self.ecog_subjects = [self.ecog_subjects[-1]]
 
         # fit and save the results
-        assessments = self.net.fit(
-            self.unique_targets_list, self.ecog_subjects, **dict(fit_kwargs))
+        assessments = self.net.fit(self.ecog_subjects, **dict(fit_kwargs))
         self._save_results(assessments)
 
         # to facilitate restoring/assessing, update hard-coded restore_epochs
@@ -315,7 +269,7 @@ class MultiSubjectTrainer:
                 fit_kwargs['train_vars_scope'] = proprietary_scopes
                 fit_kwargs['reuse_vars_scope'] = reusable_scopes
                 fit_kwargs['_restore_epoch'] = latest_epoch
-                self.net.fit(self.unique_targets_list, [subject], **fit_kwargs)
+                self.net.fit([subject], **fit_kwargs)
 
                 # then set up for next next training phase
                 latest_epoch += self.net.Nepochs
@@ -327,8 +281,7 @@ class MultiSubjectTrainer:
                 training_epochs += posttraining_epochs
             self.net.Nepochs = training_epochs
             fit_kwargs['train_vars_scope'] = 'seq2seq'
-            assessments = self.net.fit(
-                self.unique_targets_list, [subject], **fit_kwargs)
+            assessments = self.net.fit([subject], **fit_kwargs)
             latest_epoch += self.net.Nepochs
             self._save_results(assessments)
 
@@ -341,7 +294,7 @@ class MultiSubjectTrainer:
 
         self.update_net_from_saved_model()
         assessment_dict = self.net.restore_and_assess(
-            self.unique_targets_list, self.ecog_subjects, self.restore_epoch)
+            self.ecog_subjects, self.restore_epoch)
         return assessment_dict
 
     def update_net_from_saved_model(self):
@@ -372,13 +325,14 @@ class MultiSubjectTrainer:
             # otherwise go with the default value
 
     def _training_intersection_validation_union(
-        self, data_key, special_tokens=[]
+        self, sequence_type, special_tokens=[]
     ):
         '''
-        Typically used when neither a UTL nor a vocab_file has been provided
+        Typically used when neither a vocab_list nor a vocab_file has been
+        provided, and not vocab_file.pkl has been found.
         '''
 
-        # to get the unique_targets_list...
+        # to get the class_list...
         targets_list = list(reduce(
             # ...reduce via the union across the DATA_PARTITIONS...
             lambda A, B: A | B, [
@@ -386,10 +340,11 @@ class MultiSubjectTrainer:
                     # ...of the reductions across the intersection or union...
                     (lambda A, B: A & B) if data_partition == 'training' else (
                         lambda A, B: A | B),
-                    # ...of the unique_targets_list of this data_partition
+                    # ...of the class_list of this data_partition
                     [
-                        set(s.write_tf_records_maybe([data_partition], data_key))
-                        for s in self.ecog_subjects
+                        set(s.write_tf_records_maybe(
+                            sequence_type, [data_partition]
+                        )) for s in self.ecog_subjects
                     ]
                 ) for data_partition in DATA_PARTITIONS
             ]
@@ -510,8 +465,8 @@ class MultiSubjectTrainer:
         '''
 
         # the save-file path/name
-        experiment_manifest = self.experiment_manifest[
-            self.ecog_subjects[-1].subnet_id]
+        subject = self.ecog_subjects[-1]
+        experiment_manifest = self.experiment_manifest[subject.subnet_id]
         save_file_dir = experiment_manifest['saved_results_dir']
         project = experiment_manifest['project']
         save_file_path = os.path.join(
@@ -553,7 +508,9 @@ class MultiSubjectTrainer:
                    )
 
         # confusion matrix looks bad in tensorboard, so rebuild here
-        N = self.ecog_subjects[-1].data_manifests['decoder_targets'].num_features
+        decoder_targets_list = subject.data_manifests[
+            'decoder_targets'].get_feature_list()
+        N = subject.data_manifests['decoder_targets'].num_features
         if N < 100:
             fig_dimension = N//6
             confusions = assessments['validation'].confusions
@@ -561,18 +518,24 @@ class MultiSubjectTrainer:
                 fig = heatmap_confusions(
                     plt.figure(figsize=(fig_dimension, fig_dimension)),
                     confusions,
-                    x_axis_labels=self.unique_targets_list,
-                    y_axis_labels=self.unique_targets_list,
+                    x_axis_labels=decoder_targets_list,
+                    y_axis_labels=decoder_targets_list,
                 )
                 fig.savefig(os.path.join(
                     save_file_dir, '%s_confusions.pdf' % self._token_type),
                     bbox_inches='tight')
 
-    def count_all_targets(self, threshold=0.4):
+    def count_all_targets(self, data_key='decoder_targets', threshold=0.4):
+
+        # which targets do you want to count?
+        targets_list = self.ecog_subjects[-1].data_manifests[
+            data_key].get_feature_list()
 
         # dump into two tuples (each entry in a tuple corresponds to a subject)
-        target_counters, sequence_counters = zip(*[subj.count_targets(
-            self.unique_targets_list, threshold) for subj in self.ecog_subjects])
+        target_counters, sequence_counters = zip(*[
+            subj.count_targets(targets_list, threshold)
+            for subj in self.ecog_subjects
+        ])
 
         # convert tuples into dictionaries so we know which subject is which
         def tuple_to_dict(tpl):
@@ -588,20 +551,23 @@ class MultiSubjectTrainer:
         trainer_attributes = {
             # 'checkpoint_dir',
             'restore_epoch',
-            'unique_targets_list',
             # 'vocab_file',
         }
+
         params_series = [pd.Series(
             {
                 # **{k: v for k, v in s.__dict__.items() if not k.startswith('_')},
-                **{key: manifest.num_features
+                **{key: getattr(manifest, 'num_features')
                    for key, manifest in s.data_manifests.items()},
+                **{'_'.join([manifest.sequence_type, 'vocab_list']):
+                    manifest.get_feature_list()
+                    for manifest in s.data_manifests.values()
+                    if manifest.distribution == 'categorical'},
                 **{attr: getattr(s, attr) for attr in subject_attributes},
                 **{attr: getattr(self, attr) for attr in trainer_attributes},
             },
             name=s.subnet_id) for s in self.ecog_subjects
         ]
-        #pdb.set_trace()
         return pd.concat(params_series, axis=1).transpose()
 
     def print_tensor_names(self):
@@ -660,8 +626,9 @@ class MultiSubjectTrainer:
 
         # backpropagate error derivatives into the inputs
         contributions = self.net.restore_and_get_saliencies(
-            self.unique_targets_list, [subject], self.restore_epoch,
-            data_partition='validation', assessment_type=assessment_type)
+            [subject], self.restore_epoch,
+            data_partition='validation', assessment_type=assessment_type
+        )
 
         # set the penalties back to their original value
         for key, manifest in subject.data_manifests.items():
@@ -711,9 +678,7 @@ class MultiSubjectTrainer:
 
         def assessment_data_fxn(num_epochs):
             GPU_op_dict, CPU_op_dict, assessments = \
-                self.net._generate_oneshot_datasets(
-                    self.unique_targets_list, subnet_params, 0
-                )
+                self.net._generate_oneshot_datasets(subnet_params, 0)
             brief_assessments = {
                 'validation': BriefAssessmentTuple(
                     initializer=assessments['validation'].initializer,
@@ -798,7 +763,7 @@ class MultiSubjectTrainer:
 
 
 def construct_online_predictor(
-    restore_dir, unique_targets_list=None, TARGETS_ARE_SEQUENCES=False
+    restore_dir, targets_list=None, TARGETS_ARE_SEQUENCES=False
 ):
 
     # open a session with the saved_model loaded into it
@@ -810,12 +775,13 @@ def construct_online_predictor(
             ['decoder_probs:0', 'sequenced_decoder_outputs:0'],
             feed_dict={'encoder_inputs:0': inputs}
         )
-        if unique_targets_list:
-            unique_tokens = (
-                unique_targets_list if TARGETS_ARE_SEQUENCES else
-                nn.targets_to_tokens(unique_targets_list, pad_token))
+        if targets_list:
+            tokens_list = (
+                targets_list if TARGETS_ARE_SEQUENCES else
+                nn.targets_to_tokens(targets_list, pad_token)
+            )
             hypotheses = target_inds_to_sequences(
-                sequenced_decoder_outputs, unique_tokens)[0]
+                sequenced_decoder_outputs, tokens_list)[0]
             return hypotheses
         else:
             return decoded_probs

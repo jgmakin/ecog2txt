@@ -58,7 +58,6 @@ class ECoGDataGenerator:
         num_mel_features=None,
         sampling_rate=None,
         token_type=None,
-        vocab_file=None,
         bad_electrodes_path=None,
         tf_record_partial_path=None,
         grid_size=None,
@@ -86,6 +85,11 @@ class ECoGDataGenerator:
         # set this directly to None
         self._bipolar_to_elec_map = None
 
+        # keys providing vocab file names end in _vocab_file; add them to self
+        for key, value in manifest.items():
+            if key[-11:] == '_vocab_file':
+                setattr(self, key, value)
+
     @property
     def target_type(self):
         if 'sequence' in self.token_type:
@@ -100,14 +104,6 @@ class ECoGDataGenerator:
 
         # now correct for subsampling the grid
         return layout[::self.grid_step, ::self.grid_step]
-
-    @property
-    def vocab_file_path(self):
-        # The vocab file *must* live in the text_dir
-        if self.vocab_file is not None:
-            return os.path.join(text_dir, self.vocab_file)
-        else:
-            return None
 
     @property
     def bad_electrodes_path(self):
@@ -228,22 +224,47 @@ class ECoGDataGenerator:
             return [e for e in all_electrodes if e in self.good_electrodes]
 
     @property
-    def num_channels(self):
+    def num_ECoG_channels(self):
         return len(self.good_channels)
 
-    def get(self, block_set):
+    def sequence_type_to_vocab_file_path(self, sequence_type):
+        # The vocab file *must* live in the text_dir
+        vocab_file_key = '_'.join([sequence_type, 'vocab_file'])
+        vocab_file = getattr(self, vocab_file_key, None)
+        if vocab_file is not None:
+            path = os.path.join(text_dir, vocab_file)
+            if os.path.isfile(path):
+                return path
+
+        # if anything else failed, return None
+        return None
+
+    def get(self, block_set, sequence_types=None):
         '''Generate and pad data'''
+
+        # init
+        if sequence_types is None:
+            sequence_types = ['ecog_sequence']
+
+        # The sequence_types 'ecog_sequence' and 'audio_sequence' are special:
+        #  their sizes are linked to properties of this data generator.  The
+        #  others are assumed to be text or anyway sensibly stored in a list.
+        #  If other, non-text sequence_types are added, this preallocation
+        #  should be adjusted accordingly.
 
         # malloc the output_dict
         num_examples = self._query(block_set)
-        output_dict = {
-            'ecog_sequence': np.zeros(
-                (num_examples, self.max_samples, self.num_channels)),
-            'audio_sequence': np.zeros(
-                (num_examples, self.max_samples, self.num_MFCC_features)),
-            'text_sequence': [],
-            'phoneme_sequence': [],
-        }
+        output_dict = dict.fromkeys(sequence_types)
+        for sequence_type in output_dict:
+            if sequence_type == 'ecog_sequence':
+                output_dict[sequence_type] = np.zeros(
+                    (num_examples, self.max_samples, self.num_ECoG_channels))
+            elif sequence_type == 'audio_sequence':
+                output_dict[sequence_type] = np.zeros(
+                    (num_examples, self.max_samples, self.num_MFCC_features))
+            else:
+                # presumably some kind of text....
+                output_dict[sequence_type] = []
 
         # for each block...
         i_example = 0
@@ -258,25 +279,26 @@ class ECoGDataGenerator:
 
                 # pack each entry of element into its output data_struct
                 for sequence_type, data_struct in output_dict.items():
+                    assert sequence_type in element, (
+                        "The sequence_type {} in the in the sequence_types"
+                        " passed to this method (or defaulted to) is not in"
+                        " the generator"
+                    ).format(sequence_type)
                     token = element[sequence_type]
                     if type(data_struct) is list:
                         data_struct.append(token)
                     elif type(data_struct) is np.ndarray:
                         excess = self.max_samples - token.shape[0]
                         token = np.pad(token, ((0, excess), (0, 0)), 'constant')
-                        data_struct[i_example, :, :] = np.expand_dims(token, axis=0)
+                        data_struct[i_example, :, :] = np.expand_dims(
+                            token, axis=0)
                     else:
                         raise ValueError('Unexpected data structure!')
 
                 i_example += 1
         print('\n\n')
 
-        return (
-            output_dict[key] for key in [
-                'ecog_sequence', 'text_sequence',
-                'audio_sequence', 'phoneme_sequence'
-            ]
-        )
+        return output_dict
 
     def _write_to_Protobuf(self, block):
         '''
@@ -341,11 +363,11 @@ class ECoGDataGenerator:
 
             return mfccs
 
-    def write_to_Protobuf_maybe(self, block_set, sequence_type):
+    def write_to_Protobuf_maybe(self, sequence_type, block_set):
 
-        from .subjects import SequenceDataManifest
+        from ecog2txt.subjects import SequenceDataManifest
 
-        # set up a data manifest for loading in the text sequences
+        # set up a data manifest for loading in the sequences
         manifest = SequenceDataManifest(sequence_type, num_features_raw=1)
 
         target_list = []
@@ -354,7 +376,7 @@ class ECoGDataGenerator:
             if not os.path.exists(data_path):
                 self._write_to_Protobuf(block)
 
-            # grab the contribution of this block to the unique_targets_list
+            # grab the contribution of this block to the target_list
             simple_graph = tf.Graph()
             with simple_graph.as_default():
                 dataset = tf.data.TFRecordDataset(data_path)
@@ -382,67 +404,65 @@ class ECoGDataGenerator:
             w.decode('utf-8') for word_list in target_list for w in word_list
         ))
 
-    def get_unique_targets(self, block_set=None):
-        assert (self.vocab_file_path is not None) | (block_set is not None), (
-            'This ECoGDataGenerator has no vocab_file, so to generate a unique'
-            ' targets list, this method must be passed a block_set'
-        )
-        # NB: The vocab_file has precendence over the block_set
-
-        if self.vocab_file_path is not None:
+    def get_class_list(self, sequence_type=None, block_set=None):
+        if sequence_type is not None:
+            vocab_file_path = self.sequence_type_to_vocab_file_path(sequence_type)
             if self.token_type == 'word_piece_sequence':
-                unique_targets_list = self.TokenEncoder()._all_subtoken_strings
+                class_list = self.TokenEncoder(
+                    vocab_file_path)._all_subtoken_strings
             else:
-                with open(self.vocab_file_path, 'r') as f:
-                    unique_targets_list = [word for word in f.read().split()]
+                with open(vocab_file_path, 'r') as f:
+                    class_list = [word for word in f.read().split()]
+        elif block_set is not None:
+            class_list = self.write_to_Protobuf_maybe(sequence_type, block_set)
         else:
-            unique_targets_list = self.write_to_Protobuf_maybe(
-                block_set, 'decoder_targets'
+            raise ValueError(
+                'get_class_list requires at least one of a sequence_type or a'
+                ' block_set (the former has priority) as an input argument.'
             )
 
-        return unique_targets_list
+        return class_list
 
-    def _sentence_tokenize(self, token_list):
+    def _sentence_tokenize(self, token_list, sequence_type=None):
         # NB that conversion to UTF-8 (bytes objects) also happens here:
         #  token_list is a list of *strings*, but the tokenized_sentence is a
         #  list of *bytes*.
 
-        if self.vocab_file_path:
-            if self.token_type == 'word_piece_sequence':
-                # get the encoder and unique_targets via tensor2tensor code
-                token_encoder = self.TokenEncoder()
-                unique_targets = token_encoder._all_subtoken_strings
+        if self.token_type == 'word_piece_sequence':
+            # get the encoder and unique_targets via tensor2tensor code
+            vocab_file_path = self.sequence_type_to_vocab_file_path(sequence_type)
+            token_encoder = self.TokenEncoder(vocab_file_path)
+            unique_targets = token_encoder._all_subtoken_strings
 
-                # we can't just encode, we must also break into subwords
-                indices = token_encoder.encode(' '.join(
-                    [token.lower() for token in token_list]))
-                tokenized_sentence = [
-                    unique_targets[i].encode('utf-8') for i in indices]
-            else:
-                tokenized_sentence = [(token.lower() + '_').encode('utf-8')
-                                      for token in token_list]
+            # we can't just encode, we must also break into subwords
+            indices = token_encoder.encode(' '.join(
+                [token.lower() for token in token_list]))
+            tokenized_sentence = [
+                unique_targets[i].encode('utf-8') for i in indices]
+        elif self.token_type == 'trial':
+            # So that we can use vocab_files with (one-word) trials, we always
+            #  append an underscore to each word, before joining them together.
+            tokenized_sentence = [' '.join(
+                [token.lower() + '_' for token in token_list]
+            ).encode('utf-8')]
         else:
-            if self.token_type == 'trial':
-                # For parallelism with everything, put each sentence into a
-                #  length-one list
-                tokenized_sentence = [' '.join(
-                    [token.lower() for token in token_list]).encode('utf-8')]
-            else:
-                # 'word_sequence', 'word', 'phoneme'
-                tokenized_sentence = [(token.lower() + '_').encode('utf-8')
-                                      for token in token_list]
+            # all other token_types are lists (possibly of length-1) of
+            #  underscore-postfixed tokens
+            tokenized_sentence = [
+                (token.lower() + '_').encode('utf-8') for token in token_list
+            ]
 
         return tokenized_sentence
 
-    def TokenEncoder(self):
+    def TokenEncoder(self, vocab_file_path):
         '''
         if self.token_type == 'word_piece_sequence':
-            return text_encoder.SubwordTextEncoder(self.vocab_file_path)
+            return text_encoder.SubwordTextEncoder(vocab_file_path)
         else:
             return text_encoder.TokenTextEncoder(
-                self.vocab_file_path, replace_oov=OOV_token)
+                vocab_file_path, replace_oov=OOV_token)
         '''
-        return text_encoder.SubwordTextEncoder(self.vocab_file_path)
+        return text_encoder.SubwordTextEncoder(vocab_file_path)
 
     #############
     # DUMMY PROPERTIES AND METHODS
