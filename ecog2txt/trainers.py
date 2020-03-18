@@ -149,11 +149,14 @@ class MultiSubjectTrainer:
                     # none of the above, yet the data are still categorical
                     else:
                         self.vprint("training-intersection/validation-union")
+                        special_tokens = (
+                            [pad_token, EOS_token, OOV_token]
+                            if 'sequence' in self._token_type
+                            and data_key != 'encoder_targets'
+                            else [pad_token, OOV_token]
+                        )
                         class_list = self._training_intersection_validation_union(
-                            sequence_type, [pad_token, EOS_token, OOV_token]
-                            # ([pad_token, EOS_token, OOV_token]
-                            #  if 'sequence' in self._token_type else
-                            #  [OOV_token])
+                            sequence_type, special_tokens
                         )
 
                     # ...

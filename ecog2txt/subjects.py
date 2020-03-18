@@ -30,11 +30,11 @@ class ECoGSubject:
         input_mask=None,
         target_specs=(),
         block_ids=(),
-        decimation_factor=None,
         #####
         # in the manifest
         block_types=None,
         data_mapping=None,
+        decimation_factor=None,  # has priority over sampling_rate_decimated
         sampling_rate_decimated=None,
         #####
         # private; do no assign to self
@@ -135,11 +135,12 @@ class ECoGSubject:
 
     @property
     def decimation_factor(self):
-        if self._decimation_factor:
-            factor = self._decimation_factor
-        else:
+        if self._decimation_factor is None:
             factor = int(np.round(
-                self.data_generator.sampling_rate/self.sampling_rate_decimated))
+                self.data_generator.sampling_rate/self.sampling_rate_decimated
+            ))
+        else:
+            factor = self._decimation_factor
 
         return factor
 
