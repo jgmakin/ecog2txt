@@ -268,6 +268,7 @@ class ECoGDataGenerator:
 
         # for each block...
         i_example = 0
+        num_clipped = 0
         print('\nLoading data for tensor construction...')
         for block in block_set:
 
@@ -289,6 +290,8 @@ class ECoGDataGenerator:
                         data_struct.append(token)
                     elif type(data_struct) is np.ndarray:
                         excess = self.max_samples - token.shape[0]
+                        if excess == 0:
+                            num_clipped += 1
                         token = np.pad(token, ((0, excess), (0, 0)), 'constant')
                         data_struct[i_example, :, :] = np.expand_dims(
                             token, axis=0)
@@ -297,6 +300,8 @@ class ECoGDataGenerator:
 
                 i_example += 1
         print('\n\n')
+        print('WARNING: %i of %i sequences ' % (num_clipped, i_example))
+        print(' (%.2f\%) have been clipped' % (num_clipped/i_example))
 
         return output_dict
 

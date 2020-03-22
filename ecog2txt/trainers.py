@@ -159,8 +159,11 @@ class MultiSubjectTrainer:
                             sequence_type, special_tokens
                         )
 
-                    # ...
-                    data_manifest.get_feature_list = lambda: class_list
+                    # and now set it (extremely verbosely because of python's
+                    #  idiodic late binding)
+                    data_manifest.get_feature_list = (
+                        lambda class_list=class_list: class_list
+                    )
                 else:
                     # don't do anything for non-categorical data
                     pass
