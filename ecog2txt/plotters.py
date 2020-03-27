@@ -1254,7 +1254,8 @@ class ResultsPlotter():
 
     def plot_schematic_figures(self):
         '''
-        Plot example ECoG, convolutions, hidden encoder states, and predicted MFCCs
+        Plot example ECoG, convolutions, hidden encoder states, and predicted
+        MFCCs
         '''
 
         # ...

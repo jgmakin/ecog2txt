@@ -373,7 +373,7 @@ class MultiSubjectTrainer:
 
         # extract the dictionary mapping long var names to shapes
         reader = pywrap_tensorflow.NewCheckpointReader(os.path.join(
-            self.checkpoint_dir, 'model.ckpt') + '-%i' % 10)
+            self.checkpoint_dir, 'model.ckpt') + '-%i' % self.restore_epoch)
         var_to_shape = reader.get_variable_to_shape_map()
 
         # Accumulate a useful structure of network sizes.  You have to assemble
@@ -439,7 +439,7 @@ class MultiSubjectTrainer:
                     ):
                         # The only relevant info is the output size.  NB that
                         # the weight matrix of this layer is *transposed*
-                        data_sizes[subnet_id][subsubnet.replace('_projection', '_target')] = \
+                        data_sizes[subnet_id][subsubnet.replace('_projection', '_targets')] = \
                             subsubnet_info[layer_number][0]
                     else:
                         weight_shape = subsubnet_info[layer_number]

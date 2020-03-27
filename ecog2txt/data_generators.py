@@ -299,9 +299,11 @@ class ECoGDataGenerator:
                         raise ValueError('Unexpected data structure!')
 
                 i_example += 1
+
+        # some information
         print('\n\n')
         print('WARNING: %i of %i sequences ' % (num_clipped, i_example))
-        print(' (%.2f\%) have been clipped' % (num_clipped/i_example))
+        print(' (%.2f%%) have been clipped' % (100*num_clipped/i_example))
 
         return output_dict
 
