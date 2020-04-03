@@ -4,15 +4,15 @@ Code for decoding speech as text from neural data
 This package contains Python code for the high-level aspects of decoding speech from neural data, including transfer learning across multiple subjects.  It was used for all results in the paper "Machine translation of cortical activity to text with an encoder-decoder framework" (Makin et al., _Nature Neuroscience_, 2020).  These high-level aspects include the structuring of the training, the organization by subjects, and the construction of [`TFRecord`s](https://www.tensorflow.org/tutorials/load_data/tfrecord).  The (low-level) training itself is done with the adjacent [`machine_learning` package](https://github.com/jgmakin/machine_learning), which implements sequence-to-sequence networks in [TensorFlow](https://www.tensorflow.org).
 
 ## Installation
-1.  Install [TensorFlow](https://www.tensorflow.org) 1.14.1.  (You may be tempted to install the final version of TF1, 1.15, but that will break things.)
+1.  Install [TensorFlow 1.15.2](https://www.tensorflow.org), the final version of TF1.x.
     ```
-    pip install tensorflow-gpu=1.14.1
+    pip install tensorflow-gpu=1.15.2
     ```
     If you don't have a GPU you should install the CPU version
     ```
-    pip install tensorflow=1.14.1
+    pip install tensorflow=1.15.2
     ```
-    Please consult the Tensorflow installation documents.  The most important fact to know is that TF1.14 requires CUDA 10.0.
+    Please consult the Tensorflow installation documents.  The most important facts to know are that TF1.15 requires CUDA 10.0, `libcudnn7>=7.6.5.32-1+cuda10.0`, and `libnccl2>=2.6.4-1+cuda10.0`.  (I have only tested with up to, not beyond, the listed versions of these libraries).
 
 2.  Install the three required packages:
     ```

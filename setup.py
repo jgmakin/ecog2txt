@@ -30,9 +30,10 @@ setuptools.setup(
     ],
     install_requires=[
         'numpy', 'scipy', 'matplotlib', 'pandas', 'seaborn',
-        'tikzplotlib', 'tensor2tensor==1.14.1', 'hickle',
+        'tikzplotlib', 'tensor2tensor==1.15.4', 'hickle',
         'python_speech_features', 'pyyaml', 'protobuf>=3.7',
         'tensorflow-probability>=0.7',
-        # 'samplerate', 'tensorflow-gpu==1.14'
+        # 'samplerate',
+        # 'tensorflow-gpu==1.15.2'  # the cpu version will also work
     ],
 )
