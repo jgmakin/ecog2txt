@@ -281,7 +281,8 @@ class SequenceDataManifest:
         penalty_scale=1.0,
         distribution=None,
         mask=None,
-        get_feature_list=None
+        get_feature_list=None,
+        APPEND_EOS=False
     ):
         pass
 
@@ -340,13 +341,11 @@ class SequenceDataManifest:
                       if OOV_token in feature_list else 2)
             # Just making up "2" here can give some really weird errors...
             ########
-            if EOS_token in feature_list:
-                # we've got sequence data
+            if self.APPEND_EOS:
                 return lambda seq: tfh.string_seq_to_index_seq(
                     seq, feature_list, [feature_list.index(EOS_token)], OOV_id,
                 )
             else:
-                # non-sequence data
                 return lambda seq: tfh.string_seq_to_index_seq(
                     seq, feature_list, [], OOV_id
                 )

@@ -94,6 +94,8 @@ class MultiSubjectTrainer:
         # update the data_manifests for our case
         for subject in self.ecog_subjects:
             for data_key, data_manifest in subject.data_manifests.items():
+                if data_key == 'decoder_targets' and 'sequence' in token_type:
+                    data_manifest.APPEND_EOS = True
                 try:
                     data_manifest.penalty_scale = self.experiment_manifest[
                         subject.subnet_id][data_key + '_penalty_scale']
@@ -129,7 +131,7 @@ class MultiSubjectTrainer:
 
                     # explicit vocab_list has priority 1
                     if vocab_list_name in kwargs:
-                        self.vprint("argument pased w/key %s" % vocab_list_name)
+                        self.vprint("argument passed w/key %s" % vocab_list_name)
                         class_list = kwargs[vocab_list_name]
 
                     # saved vocab_file has priority 2
