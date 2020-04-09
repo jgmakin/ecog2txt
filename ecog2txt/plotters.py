@@ -1,5 +1,6 @@
 import os
 import pdb
+import sys
 import re
 from functools import reduce
 import json
@@ -33,6 +34,7 @@ from utils_jgm.toolbox import auto_attribute, str2int_hook
 from utils_jgm.toolbox import barplot_annotate_brackets
 from utils_jgm.toolbox import anti_alias
 from ecog2txt import subjects as e2t_subjects
+import ecog2txt
 
 mpl.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}']
 #mpl.rcParams['text.usetex'] = True
@@ -55,8 +57,15 @@ class DecodingResults:
 
         if os.path.isfile(decoding_results_file_name):
             self.vprint('Found decoding results; loading into attributes...')
-            with open(decoding_results_file_name, 'r') as fp:
-                hickled_data = hickle.load(fp)
+            try:
+                with open(decoding_results_file_name, 'r') as fp:
+                    hickled_data = hickle.load(fp)
+            except ModuleNotFoundError:
+                # HACK for backward compatibility with old code structure:
+                #  a function may have been saved in the hickle file.
+                sys.modules['pycode.ecog2txt'] = ecog2txt
+                with open(decoding_results_file_name, 'r') as fp:
+                    hickled_data = hickle.load(fp)
 
             # for some results, you saved a list of the training_blocks sets
             blocks = np.array(hickled_data[0]['training_blocks'])
@@ -755,7 +764,7 @@ class ResultsPlotter():
             'flat': 650
         }
         if max_marker_size is None:
-            max_marker_size = style_to_max_marker_map(plot_style)
+            max_marker_size = style_to_max_marker_map[plot_style]
 
         # save as:
         figure_name = 'electrode_locations' + suffix

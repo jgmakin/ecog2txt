@@ -56,6 +56,14 @@ consonant_dict = {
         'nasal', 'nasal', 'nasal',
         'liquid', 'liquid',
         'approximant', 'approximant',
+    ],
+    'ARPABET': [
+        'p', 'b', 't', 'd', 'k', 'g',
+        'f', 'v', 'th', 'dh', 's', 'z', 'sh', 'zh', 'hh',
+        'ch', 'jh',
+        'm', 'n', 'ng',
+        'l', 'r',
+        'w', 'y',
     ]
 }
 consonant_df = pd.DataFrame(consonant_dict)
