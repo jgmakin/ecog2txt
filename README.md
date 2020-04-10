@@ -12,7 +12,7 @@ This package contains Python code for the high-level aspects of decoding speech 
     ```
     pip install tensorflow=1.15.2
     ```
-    Please consult the Tensorflow installation documents.  The most important facts to know are that TF1.15 requires CUDA 10.0, `libcudnn7>=7.6.5.32-1+cuda10.0`, and `libnccl2>=2.6.4-1+cuda10.0`.  (I have only tested with up to, not beyond, the listed versions of these libraries).
+    Please consult the Tensorflow installation documents.  The most important facts to know are that TF1.15 requires CUDA 10.0, `libcudnn7>=7.6.5.32-1+cuda10.0`, and `libnccl2>=2.6.4-1+cuda10.0`.  (I have only tested with up to, not beyond, the listed versions of these libraries).  Make sure the driver for your GPU is compatible with these versions of the cudNN and NCCL libraries.
 
 2.  Install the three required packages:
     ```
