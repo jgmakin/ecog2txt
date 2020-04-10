@@ -47,7 +47,7 @@
   data_mapping:
     decoder_targets: text_sequence
     encoder_inputs: ecog_sequence
-    encoder_targets: audio_sequence
+    preencoder_targets: audio_sequence
   electrode_path: /home/username/data/ecog2txt/SUBJ400/TDT_elecs_all.mat
   elevation: 0
   grid_size:
@@ -63,7 +63,7 @@
     - 800
     encoder_embedding:
     - 100
-    encoder_projection:
+    preencoder_projection:
     - 225
     encoder_rnn:
     - 400
@@ -136,7 +136,7 @@
   data_mapping:
     decoder_targets: text_sequence
     encoder_inputs: ecog_sequence
-    encoder_targets: audio_sequence
+    preencoder_targets: audio_sequence
   electrode_path: /home/username/data/ecog2txt/SUBJ401/TDT_elecs_all.mat
   elevation: 0
   grid_size:
@@ -152,7 +152,7 @@
     - 800
     encoder_embedding:
     - 100
-    encoder_projection:
+    preencoder_projection:
     - 225
     encoder_rnn:
     - 400
