@@ -490,7 +490,7 @@ class MultiSubjectTrainer:
                     # fix the *order* of the keys
                     for key in [
                         'encoder_embedding', 'preencoder_rnn', 'encoder_rnn',
-                        'encoder_projection', 'decoder_embedding',
+                        'preencoder_projection', 'decoder_embedding',
                         'decoder_rnn', 'decoder_projection'
                     ]
                 ]
@@ -780,7 +780,7 @@ def construct_online_predictor(
     # create a function which uses this session to decode
     def predict(inputs):
         decoded_probs, sequenced_decoder_outputs = sess.run(
-            ['decoder_probs:0', 'sequenced_decoder_outputs:0'],
+            ['decoder_probs:0', 'decoder_outputs:0'],
             feed_dict={'encoder_inputs:0': inputs}
         )
         if targets_list:
