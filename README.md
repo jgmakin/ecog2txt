@@ -76,7 +76,7 @@ trainer = e2t_trainers.MultiSubjectTrainer(
     subject_ids=[400, 401],
     SN_kwargs={
         'FF_dropout': 0.4,          # overwriting whatever is in the manifest
-        'TEMPORALLY_CONVOLVE':      # overwriting whatever is in the manifest
+        'TEMPORALLY_CONVOLVE': True # overwriting whatever is in the manifest
     },
     DG_kwargs={
         'REFERENCE_BIPOLAR': True,  # overwriting whatever is in the manifest
