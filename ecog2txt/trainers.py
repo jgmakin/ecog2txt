@@ -500,15 +500,15 @@ class MultiSubjectTrainer:
 
         # variables used for for plotting
         plot_interval = self.net.assessment_epoch_interval
-        max_epoch = len(assessments['training'].accuracies)*plot_interval
+        max_epoch = len(assessments['training'].decoder_accuracies)*plot_interval
         accuracies_epochs = [epoch for epoch in range(0, max_epoch, plot_interval)]
 
         # save the accuracies to a text file
         np.savetxt(save_file_path,
-                   np.stack([assessments['training'].accuracies,
-                             assessments['training'].word_error_rates,
-                             assessments['validation'].accuracies,
-                             assessments['validation'].word_error_rates,
+                   np.stack([assessments['training'].decoder_accuracies,
+                             assessments['training'].decoder_word_error_rates,
+                             assessments['validation'].decoder_accuracies,
+                             assessments['validation'].decoder_word_error_rates,
                              np.array(accuracies_epochs)], axis=1),
                    fmt="%.4f",
                    header=('training accs | training WERs | '
@@ -521,7 +521,7 @@ class MultiSubjectTrainer:
         N = subject.data_manifests['decoder_targets'].num_features
         if N < 100:
             fig_dimension = N//6
-            confusions = assessments['validation'].confusions
+            confusions = assessments['validation'].decoder_confusions
             if confusions is not None:
                 fig = heatmap_confusions(
                     plt.figure(figsize=(fig_dimension, fig_dimension)),
