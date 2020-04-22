@@ -258,10 +258,12 @@ class ECoGDataGenerator:
         for sequence_type in output_dict:
             if sequence_type == 'ecog_sequence':
                 output_dict[sequence_type] = np.zeros(
-                    (num_examples, self.max_samples, self.num_ECoG_channels))
+                    (num_examples, self.max_samples, self.num_ECoG_channels)
+                )
             elif sequence_type == 'audio_sequence':
                 output_dict[sequence_type] = np.zeros(
-                    (num_examples, self.max_samples, self.num_MFCC_features))
+                    (num_examples, self.max_samples, self.num_MFCC_features)
+                )
             else:
                 # presumably some kind of text....
                 output_dict[sequence_type] = []
