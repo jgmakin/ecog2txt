@@ -162,7 +162,7 @@ class MultiSubjectTrainer:
                         )
 
                     # and now set it (extremely verbosely because of python's
-                    #  idiodic late binding)
+                    #  idiotic late binding)
                     data_manifest.get_feature_list = (
                         lambda class_list=class_list: class_list
                     )

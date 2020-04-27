@@ -87,7 +87,7 @@ class ECoGDataGenerator:
 
         # keys providing vocab file names end in _vocab_file; add them to self
         for key, value in manifest.items():
-            if key[-11:] == '_vocab_file':
+            if key.endswith('_vocab_file'):
                 setattr(self, key, value)
 
     @property
