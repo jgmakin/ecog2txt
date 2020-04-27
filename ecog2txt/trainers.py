@@ -154,7 +154,7 @@ class MultiSubjectTrainer:
                         special_tokens = (
                             [pad_token, EOS_token, OOV_token]
                             if 'sequence' in self._token_type
-                            and data_key != 'encoder_targets'
+                            and data_key != 'preencoder_targets'
                             else [pad_token, OOV_token]
                         )
                         class_list = self._training_intersection_validation_union(
@@ -699,14 +699,14 @@ class MultiSubjectTrainer:
             with tf.variable_scope('seq2seq', reuse=tf.compat.v1.AUTO_REUSE):
                 # reverse and decimate encoder targets
                 _, get_targets_lengths = nn.sequences_tools(
-                    GPU_op_dict['encoder_targets'])
+                    GPU_op_dict['preencoder_targets'])
                 reverse_targets = tf.reverse_sequence(
-                    GPU_op_dict['encoder_targets'], get_targets_lengths,
+                    GPU_op_dict['preencoder_targets'], get_targets_lengths,
                     seq_axis=1, batch_axis=0)
                 decimate_reversed_targets = reverse_targets[
                     :, 0::subnet_params.decimation_factor, :]
 
-                self.net._prepare_encoder_targets(
+                self.net._prepare_preencoder_targets(
                     GPU_op_dict, 0, subnet_params.decimation_factor)
 
                 with tf.compat.v1.variable_scope(
