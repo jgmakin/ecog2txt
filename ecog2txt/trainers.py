@@ -154,7 +154,7 @@ class MultiSubjectTrainer:
                         special_tokens = (
                             [pad_token, EOS_token, OOV_token]
                             if 'sequence' in self._token_type
-                            and data_key != 'preencoder_targets'
+                            and 'encoder_' not in data_key
                             else [pad_token, OOV_token]
                         )
                         class_list = self._training_intersection_validation_union(
@@ -486,13 +486,8 @@ class MultiSubjectTrainer:
                     str(self.net.FF_dropout),
                     str(self.net.RNN_dropout),
                 ] + [
-                    '-'.join(str(N) for N in self.net.layer_sizes[key])
-                    # fix the *order* of the keys
-                    for key in [
-                        'encoder_embedding', 'preencoder_rnn', 'encoder_rnn',
-                        'preencoder_projection', 'decoder_embedding',
-                        'decoder_rnn', 'decoder_projection'
-                    ]
+                    '-'.join(str(N) for N in sizes)
+                    for key, sizes in sorted(self.net.layer_sizes.items())
                 ]
             )
         )
@@ -698,15 +693,18 @@ class MultiSubjectTrainer:
         def assessment_net_builder(GPU_op_dict, CPU_op_dict):
             with tf.variable_scope('seq2seq', reuse=tf.compat.v1.AUTO_REUSE):
                 # reverse and decimate encoder targets
+                ####
+                # HARD-CODED for 'encoder_1_targets'
                 _, get_targets_lengths = nn.sequences_tools(
-                    GPU_op_dict['preencoder_targets'])
+                    GPU_op_dict['encoder_1_targets'])
                 reverse_targets = tf.reverse_sequence(
-                    GPU_op_dict['preencoder_targets'], get_targets_lengths,
+                    GPU_op_dict['encoder_1_targets'], get_targets_lengths,
                     seq_axis=1, batch_axis=0)
                 decimate_reversed_targets = reverse_targets[
                     :, 0::subnet_params.decimation_factor, :]
+                ####
 
-                self.net._prepare_preencoder_targets(
+                self.net._prepare_encoder_targets(
                     GPU_op_dict, 0, subnet_params.decimation_factor)
 
                 with tf.compat.v1.variable_scope(
