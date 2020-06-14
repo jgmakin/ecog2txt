@@ -25,7 +25,9 @@ from ecog2txt.subjects import ECoGSubject
 from ecog2txt import plotters
 from ecog2txt import text_dir, TOKEN_TYPES, DATA_PARTITIONS
 from ecog2txt import EOS_token, pad_token, OOV_token
-
+if int(tf.__version__.split('.')[0]) == 2:
+    from machine_learning.neural_networks.tf_helpers_too import NeuralNetwork
+    from machine_learning.neural_networks.sequence_networks_too import Seq2Seq
 
 '''
 :Author: J.G. Makin (except where otherwise noted)
@@ -72,21 +74,11 @@ class MultiSubjectTrainer:
                 #####
             ) for subject_id in subject_ids]
 
-        # create the SequenceNetwork according to the experiment_manifest
-        self.net = sequence_networks.SequenceNetwork(
-            self.experiment_manifest[subject_ids[-1]],
-            EOS_token=EOS_token,
-            pad_token=pad_token,
-            OOV_token=OOV_token,
-            training_GPUs=[0],
-            TARGETS_ARE_SEQUENCES='sequence' in token_type,
-            VERBOSE=VERBOSE,
-            **dict(SN_kwargs)
-        )
-
         # invoke some setters
-        # NB: these attributes adjust self.ecog_subjects and self.net, so they
-        #  must be invoked *after* those are created.  Hence no auto_attribute!
+        # NB: these attributes adjust self.ecog_subjects, so they must be
+        #  invoked *after* those are created (hence no auto_attribute).  But
+        #  the changes to the ecog_subjects below in turn depend on the
+        #  self.checkpoint_dir, so they have to be set after these lines.
         self.VERBOSE = VERBOSE
         self.checkpoint_dir = checkpoint_dir
         self.restore_epoch = restore_epoch
@@ -102,6 +94,32 @@ class MultiSubjectTrainer:
                 except KeyError:
                     pass
         self.set_feature_lists(**kwargs)
+
+        # create the SequenceNetwork according to the experiment_manifest
+        if int(tf.__version__.split('.')[0]) == 2:
+            self.net = NeuralNetwork(
+                self.experiment_manifest[subject_ids[-1]],
+                Seq2Seq,
+                self.ecog_subjects[-1],  # temporary hack
+                EOS_token=EOS_token,
+                pad_token=pad_token,
+                OOV_token=OOV_token,
+                **dict(SN_kwargs)
+            )
+        else:
+            self.net = sequence_networks.SequenceNetwork(
+                self.experiment_manifest[subject_ids[-1]],
+                EOS_token=EOS_token,
+                pad_token=pad_token,
+                OOV_token=OOV_token,
+                training_GPUs=[0],
+                TARGETS_ARE_SEQUENCES='sequence' in token_type,
+                VERBOSE=VERBOSE,
+                **dict(SN_kwargs)
+            )
+
+        # re-run to set the net's checkpoint_path
+        self.checkpoint_dir = checkpoint_dir
 
     def vprint(self, *args, **kwargs):
         if self.VERBOSE:
@@ -162,7 +180,7 @@ class MultiSubjectTrainer:
                         )
 
                     # and now set it (extremely verbosely because of python's
-                    #  idiotic late binding)
+                    #  idiosyncratic late binding)
                     data_manifest.get_feature_list = (
                         lambda class_list=class_list: class_list
                     )
@@ -173,10 +191,14 @@ class MultiSubjectTrainer:
     @property
     def checkpoint_dir(self):
 
-        # update the SequenceNetwork's checkpoint_path as well!
-        self.net.checkpoint_path = os.path.join(
-            self._checkpoint_dir, 'model.ckpt'
-        )
+        # update the SequenceNetwork's checkpoint_path as well--if the net
+        #  has been created at this point:
+        try:
+            self.net.checkpoint_path = os.path.join(
+                self._checkpoint_dir, 'model.ckpt'
+            )
+        except AttributeError:
+            pass
         return self._checkpoint_dir
 
     @checkpoint_dir.setter
