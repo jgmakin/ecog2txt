@@ -487,6 +487,17 @@ class MultiSubjectTrainer:
                         if layer_number == min(subsubnet_info.keys()):
                             data_sizes[subnet_id]['encoder_inputs'] = weight_shape[-2]
 
+        # In SequenceNets, the encoder RNN is constructed in a python loop,
+        #  rather than within tf function, so it is the 'encoder_rnn' scope
+        #  that gets numbered, rather than the cells.  Here you convert all
+        #  these 'encoder_rnn_n` keys to a single key, 'encoder_rnn'.
+        encoder_rnn_sizes = []
+        for layer_name, layer_size in sorted(layer_sizes.items()):
+            if layer_name.startswith('encoder_rnn'):
+                encoder_rnn_sizes += layer_size
+                layer_sizes.pop(layer_name)
+        layer_sizes['encoder_rnn'] = encoder_rnn_sizes
+
         return layer_sizes, data_sizes, encoder_strides, EMA
 
     def _save_results(self, assessments):
