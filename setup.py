@@ -30,7 +30,7 @@ setuptools.setup(
     ],
     install_requires=[
         'numpy', 'scipy', 'matplotlib', 'pandas', 'seaborn',
-        'tikzplotlib', 'tensor2tensor==1.15.5', 'hickle',
+        'tikzplotlib', 'tensor2tensor==1.15.7', 'hickle',
         'python_speech_features', 'pyyaml', 'protobuf>=3.7',
         'tensorflow-probability>=0.7',
         # 'samplerate',

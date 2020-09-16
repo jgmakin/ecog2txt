@@ -2182,13 +2182,19 @@ def all_grid_search_projections(
         jj = ii % np.prod(subplot_shape)
         if jj == 0:
             fig = plt.figure(figsize=(20, 20))
-            title_bit = ', '.join(['{0}={1}'.format(param, cond) for param, cond
-                                   in zip(outer_params, conditioning_tuple[:-2])])
+            title_bit = ', '.join([
+                '{0}={1}'.format(param, cond) for param, cond
+                in zip(outer_params, conditioning_tuple[:-2])
+            ])
             fig.suptitle('Performance: ' + title_bit, fontsize=16)
-            fig.text(0.5, 0.04, inner_params[1], ha="center", va="center",
-                     fontsize=12)
-            fig.text(0.05, 0.5, inner_params[0], ha="center", va="center",
-                     rotation=90, fontsize=12)
+            fig.text(
+                0.5, 0.04, inner_params[1], ha="center", va="center",
+                fontsize=12
+            )
+            fig.text(
+                0.05, 0.5, inner_params[0], ha="center", va="center",
+                rotation=90, fontsize=12
+            )
 
         ax = fig.add_subplot(*subplot_shape, jj+1)
         ###plt.tight_layout()
