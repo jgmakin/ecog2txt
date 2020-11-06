@@ -39,7 +39,7 @@ class MultiSubjectTrainer:
         self,
         experiment_manifest_name,
         subject_ids,
-        checkpoint_dir='',
+        checkpoint_dir='.',
         restore_epoch=None,
         SN_kwargs=(),
         DG_kwargs=(),
