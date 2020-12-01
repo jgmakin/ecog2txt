@@ -69,10 +69,11 @@ The basic commands to train a model are as follows (you can e.g. run this in a P
 
 ```
 import ecog2txt.trainers as e2t_trainers
+import ecog2txt.data_generators
 
 # CREATE A NEW MODEL
 trainer = e2t_trainers.MultiSubjectTrainer(
-    experiment_manifest_name='my_experiment_manifest.yaml,
+    experiment_manifest_name=my_experiment_manifest.yaml,
     subject_ids=[400, 401],
     SN_kwargs={
         'FF_dropout': 0.4,          # overwriting whatever is in the manifest
