@@ -26,6 +26,8 @@ This package contains Python code for the high-level aspects of decoding speech 
     pip install -e ecog2txt
 
     ```
+Note that `utils_jgm` requires the user to set up a configuration file; please see the [README for that package](https://github.com/jgmakin/utils_jgm).
+
 
 ## Getting started
 In order to unify the vast set of parameters (paths, experimental block structure, neural-network hyperparameters, etc.), all experiments are organized with the help of two configuration files, `block_breakdowns.json`, and `YOUR_EXPERIMENT_manifest.yaml`.  Examples of each are included in this repository.
