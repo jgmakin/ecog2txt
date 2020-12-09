@@ -5,7 +5,6 @@ import re
 from functools import reduce
 from collections import defaultdict
 
-
 # third-party packages
 import yaml
 import numpy as np
@@ -22,7 +21,7 @@ from machine_learning.neural_networks import sequence_networks
 from machine_learning.neural_networks import tf_helpers as tfh
 from machine_learning.neural_networks import basic_components as nn
 from ecog2txt.subjects import ECoGSubject
-from ecog2txt import plotters
+from ecog2txt import plotters, data_generators
 from ecog2txt import text_dir, TOKEN_TYPES, DATA_PARTITIONS
 from ecog2txt import EOS_token, pad_token, OOV_token
 if int(tf.__version__.split('.')[0]) == 2:
@@ -800,6 +799,62 @@ class MultiSubjectTrainer:
 
         return graph_builder.assess()
 
+    def tf_record_to_numpy_data(self, subj_id, block_id):
+        '''
+        It is frequently useful to inspect the content of the tf_records.
+
+        NB: this method *does* reshape flattened ECoG data, but does *not*
+        substitute indices for strings.
+        '''
+
+        tf.compat.v1.reset_default_graph()
+
+        # get the requested ECoGSubject
+        for subject in self.ecog_subjects:
+            if subject.subj_id == subj_id:
+                break
+        else:
+            raise ValueError('Requested subject not in this trainer')
+
+        # block default transforms, e.g., of strings to indices
+        None_transforms = []
+        for key, data_manifest in subject.data_manifests.items():
+            if data_manifest._transform is None:
+                None_transforms.append(key)
+                subject.data_manifests[key]._transform = lambda seq: seq
+
+        # pull the tf_record into a TF dataset
+        dataset = tf.data.TFRecordDataset(
+            [subject.tf_record_partial_path.format(block_id)]
+        )
+
+        # parse according to the info in the data_manifests
+        dataset = dataset.map(
+            lambda example_proto: tfh.parse_protobuf_seq2seq_example(
+                example_proto, subject.data_manifests
+            ),
+            num_parallel_calls=tf.data.experimental.AUTOTUNE
+        )
+
+        # remove transform blocking by restoring original transforms
+        # pdb.set_trace()
+        for key in None_transforms:
+            subject.data_manifests[key]._transform = None
+
+        # set up the one-shot iterator
+        iterator = tf.compat.v1.data.Iterator.from_structure(
+            tf.compat.v1.data.get_output_types(dataset),
+            tf.compat.v1.data.get_output_shapes(dataset)
+        )
+        initializer = iterator.make_initializer(dataset)
+        sequenced_op_dict = iterator.get_next()
+
+        # finally, transform to numpy data
+        with tf.compat.v1.Session() as sess:
+            sess.run(initializer)
+            sequence_data = sess.run(sequenced_op_dict)
+        return sequence_data
+
 
 def construct_online_predictor(
     restore_dir, targets_list=None, TARGETS_ARE_SEQUENCES=False
@@ -840,17 +895,3 @@ def target_inds_to_sequences(hypotheses, targets_list, iExample=0):
         for hypothesis in hypotheses[iExample]
     ]
     return predicted_tokens
-
-
-# not currently in use
-def default_batch_size(machine_name, target_type):
-    sample_dict = {}
-    sample_dict['domestica', 'Phoneme'] = 1024  # fix
-    sample_dict['domestica', 'Word'] = 1024
-    sample_dict['domestica', 'Trial'] = 20  # fix
-
-    sample_dict['CUPCAKE', 'Phoneme'] = 512  # fix
-    sample_dict['CUPCAKE', 'Word'] = 320
-    sample_dict['CUPCAKE', 'Trial'] = 20  # fix
-
-    return sample_dict[machine_name, target_type]

@@ -36,7 +36,7 @@ from utils_jgm.toolbox import anti_alias
 from ecog2txt import subjects as e2t_subjects
 import ecog2txt
 
-mpl.rcParams['text.latex.preamble'] = [r'\usepackage{amsmath}']
+mpl.rcParams['text.latex.preamble'] = r'\usepackage{amsmath}'
 #mpl.rcParams['text.usetex'] = True
 
 ##############

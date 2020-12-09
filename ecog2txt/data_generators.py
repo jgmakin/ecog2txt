@@ -477,7 +477,7 @@ class ECoGDataGenerator:
     # DUMMY PROPERTIES AND METHODS
     @property
     def bipolar_to_elec_map(self):
-        print('WARNING!!!!  MAKING UP bipolar_to_elec_map!!!')
+        # print('WARNING!!!!  MAKING UP bipolar_to_elec_map!!!')
         elec_map = []
         layout = self.elec_layout  # for short
         for i in range(layout.shape[0]):
