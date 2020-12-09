@@ -1,18 +1,18 @@
 # ecog2txt
 Code for decoding speech as text from neural data
 
-This package contains Python code for the high-level aspects of decoding speech from neural data, including transfer learning across multiple subjects.  It was used for all results in the paper "Machine translation of cortical activity to text with an encoder-decoder framework" (Makin et al., _Nature Neuroscience_, 2020).  These high-level aspects include the structuring of the training, the organization by subjects, and the construction of [`TFRecord`s](https://www.tensorflow.org/tutorials/load_data/tfrecord).  The (low-level) training itself is done with the adjacent [`machine_learning` package](https://github.com/jgmakin/machine_learning), which implements sequence-to-sequence networks in [TensorFlow](https://www.tensorflow.org).
+This package contains Python code for the high-level aspects of decoding speech from neural data, including transfer learning across multiple subjects.  It was used for all results in the paper "Machine translation of cortical activity to text with an encoder-decoder framework" (Makin et al., _Nature Neuroscience_, 2020).  These high-level aspects include the structuring of the training, the organization by subjects, and the construction of [`TFRecord`](https://www.tensorflow.org/tutorials/load_data/tfrecord)s.  The (low-level) training itself is done with the adjacent [`machine_learning` package](https://github.com/jgmakin/machine_learning), which implements sequence-to-sequence networks in [TensorFlow](https://www.tensorflow.org).
 
 ## Installation
-1.  Install [TensorFlow 1.15.3](https://www.tensorflow.org), the final version of TF1.x.
+1.  Install [TensorFlow 1.15.4](https://www.tensorflow.org), the final version of TF1.x.
     ```
-    pip install tensorflow-gpu==1.15.3
+    pip install tensorflow-gpu==1.15.4
     ```
     If you don't have a GPU you should install the CPU version
     ```
-    pip install tensorflow==1.15.3
+    pip install tensorflow==1.15.4
     ```
-    Please consult the Tensorflow installation documents.  The most important facts to know are that TF1.15 requires CUDA 10.0, `libcudnn7>=7.6.5.32-1+cuda10.0`, and `libnccl2>=2.6.4-1+cuda10.0`.  (I have only tested with up to, not beyond, the listed versions of these libraries).  Make sure the driver for your GPU is compatible with these versions of the cudNN and NCCL libraries.
+    Please consult the Tensorflow installation documents.  The most important facts to know are that TF1.15 requires CUDA 10.0, `libcudnn7>=7.6.5.32-1+cuda10.0`, and `libnccl2>=2.6.4-1+cuda10.0`.  (I have only tested with up to, not beyond, the listed versions of these libraries).  Make sure the driver for your GPU is compatible with these versions of the cudNN and NCCL libraries.  And the latest version of Python supported by TF1.15 is 3.7.
 
 2.  Install the three required packages:
     ```
@@ -26,9 +26,11 @@ This package contains Python code for the high-level aspects of decoding speech 
     pip install -e ecog2txt
 
     ```
+Note that `utils_jgm` requires the user to set up a configuration file; please see the [README for that package](https://github.com/jgmakin/utils_jgm).
+
 
 ## Getting started
-In order to unify the vast set of parameters (paths, experimental block structure, neural-network hyperparameters, etc.), all experiments are organized with the help of two configuration files, `block_breakdowns.json`, and `YOUR_EXPERIMENT_manifest.yaml`.  Examples of each are included in this repository.
+In order to unify the vast set of parameters (paths, experimental block structure, neural-network hyperparameters, etc.), all experiments are organized with the help of two configuration files, `block_breakdowns.json`, and `YOUR_EXPERIMENT_manifest.yaml`, examples of each are included in this repository.
 
 1.  Edit the `block_breakdowns.json` to match your use case.  The entries are
 
@@ -54,7 +56,7 @@ In order to unify the vast set of parameters (paths, experimental block structur
     
     Finally, make sure your `experiment_manifest.yaml` lives at the `text_dir` specified in `__init__.py` (you can change this as you like, but remember that the `text_sequence_vocab_file` must live in the same directory).
 
-3. `ECoGDataGenerator`, found in `data_generators.py`, is a shell class for generating data--in more particularly for writing out the `TFRecords` that will be used for training and assessing your model--that plays nicely with the other classes.  However, three of its (required!) methods are unspecified because they depend on how *you* store *your* data.  (Dummy versions appear in `ECoGDataGenerator`; you can inspect their input and outputs there.)  You should subclass `ECoGDataGenerator` and fill in these methods:
+3. `ECoGDataGenerator`, found in `data_generators.py`, is a shell class for generating data--more particularly for writing out the `TFRecords` that will be used for training and assessing your model--that plays nicely with the other classes.  However, three of its (required!) methods are unspecified because they depend on how *you* store *your* data.  (Dummy versions appear in `ECoGDataGenerator`; you can inspect their input and outputs there.)  You should subclass `ECoGDataGenerator` and fill in these methods:
     * `_ecog_token_generator`: a Python generator that yields data structures in the form of a `dict`, each entry of which corresponds to a set of inputs and outputs on a single trial.  For example, the entries might be `ecog_sequence`,`text_sequence`, `audio_sequence`, and `phoneme_sequence`.  The last two are not strictly necessary for speech decoding and can be left out--or you can add more.  Just *make sure that you return at least the data structures requested in the `data_mapping` specified in the `manifest`*.  So e.g. if the `data_mapping` is
     ```data_mapping = {'decoder_targets': 'text_sequence', 'encoder_inputs': 'ecog_sequence'}```
     then `_ecog_token_generator` must yield dictionaries containing *at least* (but not limited to) a `text_sequence` and an `ecog_sequence`.  The entire dictionary will be written to a `TFRecord` (one for each block), so it's better to yield more rather than fewer data structures, in case you change your mind later about the `data_mapping` but don't want to have to rewrite all the `TFRecord`s.
@@ -69,10 +71,11 @@ The basic commands to train a model are as follows (you can e.g. run this in a P
 
 ```
 import ecog2txt.trainers as e2t_trainers
+import ecog2txt.data_generators
 
 # CREATE A NEW MODEL
 trainer = e2t_trainers.MultiSubjectTrainer(
-    experiment_manifest_name='my_experiment_manifest.yaml,
+    experiment_manifest_name=my_experiment_manifest.yaml,
     subject_ids=[400, 401],
     SN_kwargs={
         'FF_dropout': 0.4,          # overwriting whatever is in the manifest
