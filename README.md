@@ -39,7 +39,7 @@ In order to unify the vast set of parameters (paths, experimental block structur
     where the `DEFAULT_DATASET_VALUE` is one of `"training"`/`"validation"`/`"testing"`; and the `BLOCK_TYPE` is whatever descriptive title you want to give to your block (e.g., `"mocha-3"`).  Assigning types to the blocks allows them to be filtered out of datasets, according to information provided in the `experiment_manifest.yaml` (see next item).
     Place your edited copy into a directory we will call `json_dir`.
 
-2.  Edit one of the `*_manifest.yaml` files to something sensible for your case.  The *most important thing to know* is that many of the classes in this package (and `machine_learning`) load their default attributes from this `manifest`.  That means that, even though the keyword arguments for their constructors (`__init__()` methods) may appear to default to `None`, this `None` actually instructs the class to default to the argument's value in the `manifest`.
+2.  Edit one of the `.yaml` manifest files to something sensible for your case.  The *most important thing to know* is that many of the classes in this package (and `machine_learning`) load their default attributes from this `manifest`.  That means that, even though the keyword arguments for their constructors (`__init__()` methods) may appear to default to `None`, this `None` actually instructs the class to default to the argument's value in the `manifest`.
 
     You don't have to set all the values before your first run, but in the very least, you should:
     * Fix the paths/dirs.  For the most part they are for writing, not reading, so you can set them wherever you like.  For the three reading paths:
