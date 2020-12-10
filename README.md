@@ -36,10 +36,10 @@ In order to unify the vast set of parameters (paths, experimental block structur
 
     ```SUBJECT_ID: {BLOCK: {"type: BLOCK_TYPE, "default_dataset": DEFAULT_DATASET_VALUE}}```
     
-    where the `DEFAULT_DATASET_VALUE` is one of `"training"`/`"validation"`/`"testing"`; and the `BLOCK_TYPE` is whatever descriptive title you want to give to your block (e.g., `"mocha-3"`).  Assigning types to the blocks allows them to be filtered out of datasets, according to information provided in the `experiment_manifest.yaml` (see next item).
+    where the `DEFAULT_DATASET_VALUE` is one of `"training"`/`"validation"`/`"testing"`; and the `BLOCK_TYPE` is whatever descriptive title you want to give to your block (e.g., `"mocha-3"`).  Assigning types to the blocks allows them to be filtered out of datasets, according to information provided in the `manifest` (see next item).
     Place your edited copy into a directory we will call `json_dir`.
 
-2.  Edit one of the `.yaml` manifest files to something sensible for your case.  The *most important thing to know* is that many of the classes in this package (and `machine_learning`) load their default attributes from this `manifest`.  That means that, even though the keyword arguments for their constructors (`__init__()` methods) may appear to default to `None`, this `None` actually instructs the class to default to the argument's value in the `manifest`.
+2.  Edit [one of the `.yaml` manifest files](https://github.com/jgmakin/ecog2txt/tree/master/ecog2txt/auxiliary/EFC) to something sensible for your case.  The *most important thing to know* is that many of the classes in this package (and `machine_learning`) load their default attributes from this `manifest`.  That means that, even though the keyword arguments for their constructors (`__init__()` methods) may appear to default to `None`, this `None` actually instructs the class to default to the argument's value in the `manifest`.
 
     You don't have to set all the values before your first run, but in the very least, you should:
     * Fix the paths/dirs.  For the most part they are for writing, not reading, so you can set them wherever you like.  For the three reading paths:
@@ -50,7 +50,7 @@ In order to unify the vast set of parameters (paths, experimental block structur
     * `grid_size`: Set this to match the dimensions of your ECoG grid.
     * `text_sequence_vocab_file`: You can provide a file with a list, one word per line, of all words to be targeted by the decoder.  This key specifies just the *name* of the file; the file itself must live in the `text_dir` specified in `__init__.py`.  If you set this key to `None`, the package will attempt to build a list of unique targets directly from the `TFRecord`s.  An example vocab_file, `vocab.mocha-timit.1806`, is included in this package.
     * `data_mapping`: Use this to set which data to use as inputs and outputs for the sequence-to-sequence network--see `_ecog_token_generator` below.  
-    * `DataGenerator`: In the `manifest.yaml`, this points to the `ECoGDataGenerator` in `data_generators.py`, but you will probably want to subclass this class and point to your new (sub)class instead--see next item.
+    * `DataGenerator`: In the `manifest`, this points to the `ECoGDataGenerator` in `data_generators.py`, but you will probably want to subclass this class and point to your new (sub)class instead--see next item.
 
     You can probably get away with leaving the rest of the values in the `.yaml` at their default values, at least for your first run.
     
