@@ -46,15 +46,15 @@ In order to unify the vast set of parameters (paths, experimental block structur
       * `json_dir` must point to the location of your `block_breakdowns.json` file (see previous item).
       * `bad_electrodes_path` must point to a (possibly empty) plain-text file listing (one entry per line) any bad channels.  NB that these are assumed to be 1-indexed! (but will internally be converted to zero-indexing).  Alternatively, you can provide (either via the manifest or as an argument to the `ECoGDataGenerator`) the `good_electrodes` directly.
       * `electrode_path`: you can ignore this unless you plan to plot results on the cortical surface (in which case contact me).
-    * `block_types`: these set *necessary* conditions for membership in one of the datasets, `training`/`validation`/`testing`.  For example, in the `*_manifest.yaml`, the `testing` and `validation` sets are allowed to include only `mocha-1`, but the training set is allowed to include `mocha-1, ..., mocha-9`.  So if a `mocha-3` block has `validation` as its `"default_dataset"` in the `block_breakdowns.json`, it would be excluded altogether.
+    * `block_types`: these set *necessary* conditions for membership in one of the datasets, `training`/`validation`/`testing`.  For example, in the `mochastar_word_sequence.yaml` manifest file, the `testing` and `validation` sets are allowed to include only `mocha-1`, but the training set is allowed to include `mocha-1, ..., mocha-9`.  So if a `mocha-3` block has `validation` as its `"default_dataset"` in the `block_breakdowns.json`, it would be excluded altogether.
     * `grid_size`: Set this to match the dimensions of your ECoG grid.
     * `text_sequence_vocab_file`: You can provide a file with a list, one word per line, of all words to be targeted by the decoder.  This key specifies just the *name* of the file; the file itself must live in the `text_dir` specified in `__init__.py`.  If you set this key to `None`, the package will attempt to build a list of unique targets directly from the `TFRecord`s.  An example vocab_file, `vocab.mocha-timit.1806`, is included in this package.
     * `data_mapping`: Use this to set which data to use as inputs and outputs for the sequence-to-sequence network--see `_ecog_token_generator` below.  
-    * `DataGenerator`: In the `*_manifest.yaml`, this points to the `ECoGDataGenerator` in `data_generators.py`, but you will probably want to subclass this class and point to your new (sub)class instead--see next item.
+    * `DataGenerator`: In the `manifest.yaml`, this points to the `ECoGDataGenerator` in `data_generators.py`, but you will probably want to subclass this class and point to your new (sub)class instead--see next item.
 
     You can probably get away with leaving the rest of the values in the `.yaml` at their default values, at least for your first run.
     
-    Finally, make sure your `*_manifest.yaml` lives at the `text_dir` specified in `__init__.py` (you can change this as you like, but remember that the `text_sequence_vocab_file` must live in the same directory).
+    Finally, make sure `YOUR_EXPERIMENT_manifest.yaml` lives at the `text_dir` specified in `__init__.py` (you can change this as you like, but remember that the `text_sequence_vocab_file` must live in the same directory).
 
 3. `ECoGDataGenerator`, found in `data_generators.py`, is a shell class for generating data--more particularly for writing out the `TFRecords` that will be used for training and assessing your model--that plays nicely with the other classes.  However, three of its (required!) methods are unspecified because they depend on how *you* store *your* data.  (Dummy versions appear in `ECoGDataGenerator`; you can inspect their input and outputs there.)  You should subclass `ECoGDataGenerator` and fill in these methods:
     * `_ecog_token_generator`: a Python generator that yields data structures in the form of a `dict`, each entry of which corresponds to a set of inputs and outputs on a single trial.  For example, the entries might be `ecog_sequence`,`text_sequence`, `audio_sequence`, and `phoneme_sequence`.  The last two are not strictly necessary for speech decoding and can be left out--or you can add more.  Just *make sure that you return at least the data structures requested in the `data_mapping` specified in the `manifest`*.  So e.g. if the `data_mapping` is
@@ -75,7 +75,7 @@ import ecog2txt.data_generators
 
 # CREATE A NEW MODEL
 trainer = e2t_trainers.MultiSubjectTrainer(
-    experiment_manifest_name=my_experiment_manifest.yaml,
+    experiment_manifest_name=YOUR_EXPERIMENT_manifest.yaml,
     subject_ids=[400, 401],
     SN_kwargs={
         'FF_dropout': 0.4,          # overwriting whatever is in the manifest
