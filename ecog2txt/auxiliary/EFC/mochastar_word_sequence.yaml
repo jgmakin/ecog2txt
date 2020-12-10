@@ -1,0 +1,373 @@
+400:
+  DataGenerator: &id001 !!python/name:ecog2txt.data_generators.ECoGDataGenerator ''
+  # DataGenerator: &id001 !!python/name:ecog2txt.chang_lab_data_generators.BambooDataGenerator ''
+  EMA_decay: 0.99
+  FF_dropout: 0.1
+  Nepochs: 800
+  REFERENCE_BIPOLAR: true
+  RGB_color: !!python/tuple
+  - 0.4
+  - 0.6509803921568628
+  - 0.11764705882352941
+  RNN_dropout: 0.5
+  TEMPORALLY_CONVOLVE: true
+  USE_FIELD_POTENTIALS: false
+  USE_LOG_MELS: false
+  USE_MFCC_DELTAS: false
+  alias: participant a
+  anatomy_grand_list:
+  - middle frontal
+  - inferior temporal
+  - middle temporal
+  - superior temporal
+  - IFG
+  - supramarginal
+  - vSMC
+  assessment_epoch_interval: 10
+  audio_sequence_penalty_scale: 0.1
+  azimuth: 0
+  bad_electrodes_path: /home/makin/data/ecog/EFC400/bad_electrodes
+  beam_width: 1
+  block_descriptors:
+  - type
+  block_types:
+    testing: !!set
+      mocha-1: null
+    training: !!set
+      mocha-1: null
+      mocha-2: null
+      mocha-3: null
+      mocha-4: null
+      mocha-5: null
+      mocha-6: null
+      mocha-7: null
+      mocha-8: null
+      mocha-9: null
+    validation: !!set
+      mocha-1: null
+  data_mapping:
+    decoder_targets: text_sequence
+    encoder_1_targets: phoneme_sequence
+    encoder_inputs: ecog_sequence
+  decimation_factor: null
+  electrode_path: /home/makin/data/ecog/EFC400/TDT_elecs_all.mat
+  elevation: 0
+  encoder_1_targets_penalty_scale: 1.0
+  grid_names:
+  - R256GridElectrode
+  grid_size:
+  - 16
+  - 16
+  grid_step: 1
+  json_dir: /home/makin/code/ecog2txt/ecog2txt/auxiliary/EFC
+  layer_sizes:
+    decoder_embedding:
+    - 150
+    decoder_projection: []
+    decoder_rnn:
+    - 800
+    encoder_1_projection:
+    - 225
+    encoder_embedding:
+    - 100
+    encoder_rnn:
+    - 400
+    - 400
+    - 400
+  mfcc_winlen: 0.02
+  model_class: null
+  num_cepstral_coeffs: 0
+  num_mel_features: 26
+  num_unique_training_sentences: null
+  phoneme_sequence_vocab_file: vocab.phonemes.42
+  png_partial_path: /home/makin/figures/word_sequence/EFC400/{0}.png
+  project: EFC
+  sampling_rate: 200
+  sampling_rate_decimated: 16.5
+  saved_results_dir: /home/makin/data/ecog2txt/word_sequence/saved_results
+  subject_name: EFC400
+  temperature: 0.384
+  text_sequence_vocab_file: vocab.mocha-timit.1806
+  tf_record_partial_path: /home/makin/data/ecog2txt/word_sequence/tf_records/EFC400_B{0}.tfrecord
+  tf_summaries_dir: /home/makin/data/ecog2txt/word_sequence/tf_summaries
+  tikz_partial_path: /home/makin/Documents/#texs/tikzpics/word_sequence/EFC400/{0}.tex
+  token_type: word_sequence
+401:
+  DataGenerator: *id001
+  EMA_decay: 0.99
+  FF_dropout: 0.1
+  Nepochs: 800
+  REFERENCE_BIPOLAR: true
+  RGB_color: !!python/tuple
+  - 0.9058823529411765
+  - 0.1607843137254902
+  - 0.5411764705882353
+  RNN_dropout: 0.5
+  TEMPORALLY_CONVOLVE: true
+  USE_FIELD_POTENTIALS: false
+  USE_LOG_MELS: false
+  USE_MFCC_DELTAS: false
+  alias: participant b
+  anatomy_grand_list:
+  - middle frontal
+  - inferior temporal
+  - middle temporal
+  - superior temporal
+  - IFG
+  - supramarginal
+  - vSMC
+  assessment_epoch_interval: 10
+  audio_sequence_penalty_scale: 0.1
+  azimuth: 0
+  bad_electrodes_path: /home/makin/data/ecog/EFC401/bad_electrodes
+  beam_width: 1
+  block_descriptors:
+  - type
+  block_types:
+    testing: !!set
+      mocha-1: null
+    training: !!set
+      mocha-1: null
+      mocha-2: null
+      mocha-3: null
+      mocha-4: null
+      mocha-5: null
+      mocha-6: null
+      mocha-7: null
+      mocha-8: null
+      mocha-9: null
+    validation: !!set
+      mocha-1: null
+  data_mapping:
+    decoder_targets: text_sequence
+    encoder_1_targets: phoneme_sequence
+    encoder_inputs: ecog_sequence
+  decimation_factor: null
+  electrode_path: /home/makin/ecog/EFC401/TDT_elecs_all.mat
+  elevation: 0
+  encoder_1_targets_penalty_scale: 1.0
+  grid_names:
+  - L256GridElectrode
+  grid_size:
+  - 16
+  - 16
+  grid_step: 1
+  json_dir: /home/makin/code/ecog2txt/ecog2txt/auxiliary/EFC
+  layer_sizes:
+    decoder_embedding:
+    - 150
+    decoder_projection: []
+    decoder_rnn:
+    - 800
+    encoder_1_projection:
+    - 225
+    encoder_embedding:
+    - 100
+    encoder_rnn:
+    - 400
+    - 400
+    - 400
+  mfcc_winlen: 0.02
+  model_class: null
+  num_cepstral_coeffs: 0
+  num_mel_features: 26
+  num_unique_training_sentences: null
+  phoneme_sequence_vocab_file: vocab.phonemes.42
+  png_partial_path: /home/makin/DSftHC/word_sequence/EFC401/{0}.png
+  project: EFC
+  sampling_rate: 200
+  sampling_rate_decimated: 16.5
+  saved_results_dir: /home/makin/data/ecog2txt/word_sequence/saved_results
+  subject_name: EFC401
+  temperature: 0.384
+  text_sequence_vocab_file: vocab.mocha-timit.1806
+  tf_record_partial_path: /home/makin/data/ecog2txt/word_sequence/tf_records/EFC401_B{0}.tfrecord
+  tf_summaries_dir: /home/makin/data/ecog2txt/word_sequence/tf_summaries
+  tikz_partial_path: /home/makin/Documents/#texs/tikzpics/word_sequence/EFC401/{0}.tex
+  token_type: word_sequence
+402:
+  DataGenerator: *id001
+  EMA_decay: 0.99
+  FF_dropout: 0.1
+  Nepochs: 800
+  REFERENCE_BIPOLAR: true
+  RGB_color: !!python/tuple
+  - 0.4588235294117647
+  - 0.4392156862745098
+  - 0.7019607843137254
+  RNN_dropout: 0.5
+  TEMPORALLY_CONVOLVE: true
+  USE_FIELD_POTENTIALS: false
+  USE_LOG_MELS: false
+  USE_MFCC_DELTAS: false
+  alias: participant c
+  anatomy_grand_list:
+  - middle frontal
+  - inferior temporal
+  - middle temporal
+  - superior temporal
+  - IFG
+  - supramarginal
+  - vSMC
+  assessment_epoch_interval: 10
+  audio_sequence_penalty_scale: 0.1
+  azimuth: 180
+  bad_electrodes_path: /home/makin/data/ecog/EFC402/bad_electrodes
+  beam_width: 1
+  block_descriptors:
+  - type
+  block_types:
+    testing: !!set
+      mocha-1: null
+    training: !!set
+      mocha-1: null
+      mocha-2: null
+      mocha-3: null
+      mocha-4: null
+      mocha-5: null
+      mocha-6: null
+      mocha-7: null
+      mocha-8: null
+      mocha-9: null
+    validation: !!set
+      mocha-1: null
+  data_mapping:
+    decoder_targets: text_sequence
+    encoder_1_targets: phoneme_sequence
+    encoder_inputs: ecog_sequence
+  decimation_factor: null
+  electrode_path: /home/makin/data.ecog/EFC402/TDT_elecs_all.mat
+  elevation: 10
+  encoder_1_targets_penalty_scale: 1.0
+  grid_names:
+  - InferiorGrid
+  grid_size:
+  - 8
+  - 16
+  grid_step: 1
+  json_dir: /home/makin/code/ecog2txt/ecog2txt/auxiliary/EFC
+  layer_sizes:
+    decoder_embedding:
+    - 150
+    decoder_projection: []
+    decoder_rnn:
+    - 800
+    encoder_1_projection:
+    - 225
+    encoder_embedding:
+    - 100
+    encoder_rnn:
+    - 400
+    - 400
+    - 400
+  mfcc_winlen: 0.02
+  model_class: null
+  num_cepstral_coeffs: 0
+  num_mel_features: 26
+  num_unique_training_sentences: null
+  phoneme_sequence_vocab_file: vocab.phonemes.42
+  png_partial_path: /home/makin/figures/word_sequence/EFC402/{0}.png
+  project: EFC
+  sampling_rate: 190.73486328125
+  sampling_rate_decimated: 16.5
+  saved_results_dir: /home/makin/data/ecog2txt/word_sequence/saved_results
+  subject_name: EFC402
+  temperature: 0.384
+  text_sequence_vocab_file: vocab.mocha-timit.1806
+  tf_record_partial_path: /home/makin/data/ecog2txt/word_sequence/tf_records/EFC402_B{0}.tfrecord
+  tf_summaries_dir: /home/makin/data/ecog2txt/word_sequence/tf_summaries
+  tikz_partial_path: /home/makin/Documents/#texs/tikzpics/word_sequence/EFC402/{0}.tex
+  token_type: word_sequence
+403:
+  DataGenerator: *id001
+  EMA_decay: 0.99
+  FF_dropout: 0.1
+  Nepochs: 800
+  REFERENCE_BIPOLAR: true
+  RGB_color: !!python/tuple
+  - 0.6509803921568628
+  - 0.4627450980392157
+  - 0.11372549019607843
+  RNN_dropout: 0.5
+  TEMPORALLY_CONVOLVE: true
+  USE_FIELD_POTENTIALS: false
+  USE_LOG_MELS: false
+  USE_MFCC_DELTAS: false
+  alias: participant d
+  anatomy_grand_list:
+  - middle frontal
+  - inferior temporal
+  - middle temporal
+  - superior temporal
+  - IFG
+  - supramarginal
+  - vSMC
+  assessment_epoch_interval: 10
+  audio_sequence_penalty_scale: 0.1
+  azimuth: 170
+  bad_electrodes_path: /home/makin/data/ecog/EFC403/bad_electrodes
+  beam_width: 1
+  block_descriptors:
+  - type
+  block_types:
+    testing: !!set
+      mocha-1: null
+    training: !!set
+      mocha-1: null
+      mocha-2: null
+      mocha-3: null
+      mocha-4: null
+      mocha-5: null
+      mocha-6: null
+      mocha-7: null
+      mocha-8: null
+      mocha-9: null
+    validation: !!set
+      mocha-1: null
+  data_mapping:
+    decoder_targets: text_sequence
+    encoder_1_targets: phoneme_sequence
+    encoder_inputs: ecog_sequence
+  decimation_factor: null
+  electrode_path: /home/makin/data/EFC403/TDT_elecs_all.mat
+  elevation: 0
+  encoder_1_targets_penalty_scale: 1.0
+  grid_names:
+  - Grid
+  grid_size:
+  - 16
+  - 16
+  grid_step: 1
+  json_dir: /home/makin/code/ecog2txt/ecog2txt/auxiliary/EFC
+  layer_sizes:
+    decoder_embedding:
+    - 150
+    decoder_projection: []
+    decoder_rnn:
+    - 800
+    encoder_1_projection:
+    - 225
+    encoder_embedding:
+    - 100
+    encoder_rnn:
+    - 400
+    - 400
+    - 400
+  mfcc_winlen: 0.02
+  model_class: null
+  num_cepstral_coeffs: 0
+  num_mel_features: 26
+  num_unique_training_sentences: null
+  phoneme_sequence_vocab_file: vocab.phonemes.42
+  png_partial_path: /home/makin/figures/word_sequence/EFC403/{0}.png
+  project: EFC
+  sampling_rate: 190.73486328125
+  sampling_rate_decimated: 16.5
+  saved_results_dir: /home/makin/data/ecog2txt/word_sequence/saved_results
+  subject_name: EFC403
+  temperature: 0.384
+  text_sequence_vocab_file: vocab.mocha-timit.1806
+  tf_record_partial_path: /home/makin/data/ecog2txt/word_sequence/tf_records/EFC403_B{0}.tfrecord
+  tf_summaries_dir: /home/makin/data/ecog2txt/word_sequence/tf_summaries
+  tikz_partial_path: /home/makin/Documents/#texs/tikzpics/word_sequence/EFC403/{0}.tex
+  token_type: word_sequence
