@@ -120,6 +120,9 @@ class MultiSubjectTrainer:
         # re-run to set the net's checkpoint_path
         self.checkpoint_dir = checkpoint_dir
 
+        # initialize
+        self._results_plotter = None
+
     def vprint(self, *args, **kwargs):
         if self.VERBOSE:
             print(*args, **kwargs)
@@ -234,18 +237,23 @@ class MultiSubjectTrainer:
 
     @property
     def results_plotter(self):
-        subject = self.ecog_subjects[-1]
-        results_plotter = plotters.ResultsPlotter(
-            self.experiment_manifest[subject.subnet_id], subject,
-            VERBOSE=self.VERBOSE, **self._RP_kwargs
-        )
+        if self._results_plotter is None:
+            subject = self.ecog_subjects[-1]
+            self.results_plotter = plotters.ResultsPlotter(
+                self.experiment_manifest[subject.subnet_id], subject,
+                VERBOSE=self.VERBOSE, **self._RP_kwargs
+            )
 
+        return self._results_plotter
+
+    @results_plotter.setter
+    def results_plotter(self, results_plotter):
         # set up methods
         results_plotter.get_saliencies = self.get_saliencies
         results_plotter.get_encoder_embedding = self.get_encoder_embedding
         results_plotter.get_internal_activations = self.get_internal_activations
 
-        return results_plotter
+        self._results_plotter = results_plotter
 
     def parallel_transfer_learn(self, RESUME=False, fit_kwargs=()):
         '''
