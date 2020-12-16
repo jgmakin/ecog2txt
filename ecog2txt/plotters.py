@@ -60,7 +60,7 @@ class DecodingResults:
             try:
                 with open(decoding_results_file_name, 'r') as fp:
                     hickled_data = hickle.load(fp)
-            except ModuleNotFoundError:
+            except:  # ModuleNotFoundError:
                 # HACK for backward compatibility with old code structure:
                 #  a function may have been saved in the hickle file.
                 sys.modules['pycode.ecog2txt'] = ecog2txt
@@ -119,7 +119,6 @@ class ResultsPlotter():
         manifest,
         subject,
         suffix='',
-        saved_results_subdir='',
         contrib_method='decoder_saliency_map',
         line_style='solid',
         VERBOSE=True,
@@ -144,7 +143,7 @@ class ResultsPlotter():
 
         # LOAD OCCLUSION-TRAINED DECODING RESULTS
         # occlusion_results_file_name = os.path.join(
-        #     self.saved_results_dir, saved_results_subdir,
+        #     self.saved_results_dir,
         #     'occlusion_sensitivity_{0}_{1}.hkl'
         # ).format(self.subject.subnet_id, experiment)
         # if os.path.isfile(occlusion_results_file_name):
@@ -174,11 +173,28 @@ class ResultsPlotter():
         self._nums_counted_repeats = None
 
     @property
+    def saved_results_dir(self):
+        return '.' if self._saved_results_dir is None else self._saved_results_dir
+
+    @saved_results_dir.setter
+    def saved_results_dir(self, saved_results_dir):
+        if hasattr(self, '_saved_results_dir'):
+            # check if the argument works as a subdir of its predecessor
+            full_dir = os.path.join(self._saved_results_dir, saved_results_dir)
+            if os.path.isdir(full_dir):
+                print("INTERPRETING USER-PROVIDED SAVED_RESULTS_DIR AS SUBDIR")
+                self._saved_results_dir = full_dir
+                return
+
+        # ok, it's the whole path
+        print("USING USER-PROVIDED SAVED_RESULTS_DIR")
+        self._saved_results_dir = saved_results_dir
+
+    @property
     def decoding_results(self):
         if self._decoding_results is None:
             decoding_results_file_name = os.path.join(
-                self.saved_results_dir, self.saved_results_subdir,
-                'perf_vs_training_size_{0}_{1}.hkl'
+                self.saved_results_dir, 'perf_vs_training_size_{0}_{1}.hkl'
             ).format(self.subject.subnet_id, self.suffix)
             self._decoding_results = DecodingResults(
                 decoding_results_file_name, self.VERBOSE)
@@ -219,10 +235,7 @@ class ResultsPlotter():
 
     @property
     def RGB_color(self):
-        if self._RGB_color is None:
-            return [0, 0, 0]
-        else:
-            return self._RGB_color
+        return [0, 0, 0] if self._RGB_color is None else self._RGB_color
 
     @RGB_color.setter
     def RGB_color(self, RGB_color):
@@ -230,7 +243,7 @@ class ResultsPlotter():
 
     @property
     def elevation(self):
-        return self._elevation if self._elevation is not None else 0
+        return 0 if self._elevation is None else self._elevation
 
     @elevation.setter
     def elevation(self, elevation):
@@ -238,7 +251,7 @@ class ResultsPlotter():
 
     @property
     def azimuth(self):
-        return self._azimuth if self._azimuth is not None else 0
+        return 0 if self._azimuth is None else self._azimuth
 
     @azimuth.setter
     def azimuth(self, azimuth):
@@ -1041,7 +1054,7 @@ class ResultsPlotter():
         )
 
     def kernel_density_plot_electrode_contributions(
-        self, kernel_width=0.4, y_upper_bound=35, label_color=None,
+        self, bw_adjust=1.0, y_upper_bound=35, label_color=None,
         VERTICAL=False
     ):
 
@@ -1056,7 +1069,7 @@ class ResultsPlotter():
                 'col_order': self.anatomy_grand_list,
                 'col': 'areas',
                 'aspect': 1/3,
-                'size': 3.0
+                'height': 3.0
             }
             x_data = 'scatter_y'
             y_data = 'contributions'
@@ -1067,7 +1080,7 @@ class ResultsPlotter():
                 'row_order': self.anatomy_grand_list,
                 'row': 'areas',
                 'aspect': 6,
-                'size': 0.75
+                'height': 0.75
             }
             x_data = 'contributions'
             y_data = 'scatter_y'
@@ -1096,10 +1109,10 @@ class ResultsPlotter():
         # draw the densities in a few steps
         facet_grid.map(
             sns.kdeplot, 'contributions', clip=[0, 1.0], shade=True,
-            alpha=1, lw=1.5, bw=kernel_width, vertical=VERTICAL)
+            alpha=1, lw=1.5, bw_adjust=bw_adjust, vertical=VERTICAL)
         facet_grid.map(
             sns.kdeplot, 'contributions', clip=[0, 1.0], color="w",
-            lw=2, bw=kernel_width, vertical=VERTICAL)
+            lw=2, bw_adjust=bw_adjust, vertical=VERTICAL)
         facet_grid.map(ax_line, **ax_line_kwargs, lw=2, clip_on=False)
         facet_grid.map_dataframe(
             plt.scatter, y=y_data, x=x_data, color='black',
@@ -1772,7 +1785,7 @@ def plot_performance_with_all_data(
 
             ##################
             # This is kind of a hack:  Here you assume that all results have
-            #  the same subnet_id and saved_results_subdir.  It's not as bad as
+            #  the same subnet_id and saved_results_dir.  It's not as bad as
             #  it looks: this is actually already built into apply_comparisons,
             #  and the json files you build to hold your comparisons.  But
             #  ideally you would be able to make comparisons *across* these
@@ -1781,7 +1794,6 @@ def plot_performance_with_all_data(
             #  with comparisons not set to None.
             saved_results_partial_path = os.path.join(
                 plotters_list[0].saved_results_dir,
-                plotters_list[0].saved_results_subdir,
                 'perf_vs_training_size_{0}_{1}.hkl'
             ).format(plotters_list[0].subject.subnet_id, '%s')
             ###############

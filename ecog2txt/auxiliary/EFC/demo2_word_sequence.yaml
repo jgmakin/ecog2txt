@@ -148,7 +148,7 @@
     encoder_1_targets: phoneme_sequence
     encoder_inputs: ecog_sequence
   decimation_factor: null
-  electrode_path: /home/makin/data/EFC403/TDT_elecs_all.mat
+  electrode_path: /home/makin/data/ecog/EFC403/TDT_elecs_all.mat
   elevation: 0
   encoder_1_targets_penalty_scale: 1.0
   grid_names:

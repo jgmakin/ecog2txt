@@ -816,7 +816,7 @@ class MultiSubjectTrainer:
         else:
             raise ValueError('Requested subject not in this trainer')
 
-        # block default transforms, e.g., of strings to indices
+        # block default transforms, e.g. of strings to indices; see subjects.py
         None_transforms = []
         for key, data_manifest in subject.data_manifests.items():
             if data_manifest._transform is None:
@@ -837,7 +837,6 @@ class MultiSubjectTrainer:
         )
 
         # remove transform blocking by restoring original transforms
-        # pdb.set_trace()
         for key in None_transforms:
             subject.data_manifests[key]._transform = None
 
@@ -852,8 +851,12 @@ class MultiSubjectTrainer:
         # finally, transform to numpy data
         with tf.compat.v1.Session() as sess:
             sess.run(initializer)
-            sequence_data = sess.run(sequenced_op_dict)
-        return sequence_data
+            while True:
+                try:
+                    yield sess.run(sequenced_op_dict)
+                except tf.errors.OutOfRangeError:
+                    break
+        #return sequence_data
 
 
 def construct_online_predictor(
