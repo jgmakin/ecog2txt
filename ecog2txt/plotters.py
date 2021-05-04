@@ -687,11 +687,11 @@ class ResultsPlotter():
         if versus == 'minutes':
             data_amount = ResultsMatrix(self.nums_seconds.data/60)
             x_label = 'minutes of training data'
-        elif versus == 'nominal_repeats':
+        elif versus == 'nominal repeats':
             # slightly less reliable...
             data_amount = self.nums_nominal_repeats
             x_label = 'number of training repeats'
-        elif versus == 'counted_repeats':
+        elif versus == 'counted repeats':
             data_amount = self.nums_counted_repeats
             x_label = 'number of training repeats'
         else:
@@ -723,46 +723,6 @@ class ResultsPlotter():
         #ax.spines['left'].set_color('1.0')
 
         return p
-
-    def bar_plot_performance_with_all_data(
-        self, performance_measure, x_pos=0, fig_num=0, SHOW_Y_LABEL=True,
-        width=0.7, y_major_ticks=None, ymin=0.0, ymax=100.0, BOLD_LABEL=False
-    ):
-
-        # ordinate: only use the *final* (most-data) results
-        perf_means = 100*getattr(self, performance_measure).mean[-1]
-        perf_std_errors = 100*getattr(self, performance_measure).std_err[-1]
-
-        # plot
-        fig = plt.figure(fig_num)
-        ax = fig.get_axes()[0] if fig.get_axes() else fig.add_subplot(111)
-        label = suffix_to_label(self.suffix, BOLD_LABEL)
-
-        #####
-        ax.bar(
-            x_pos, perf_means, yerr=perf_std_errors, width=width,
-            color=self.RGB_color
-        )
-        # sns.violinplot(x=label, y=)
-        #####
-
-        if x_pos == 0:
-            ax.set_xticks([x_pos])
-            ax.set_xticklabels([label], rotation=0)
-        else:
-            x_ticks = ax.get_xticks()
-            x_tick_labels = [item.get_text() for item in ax.get_xticklabels()]
-            ax.set_xticks(np.append(x_ticks, x_pos))
-            ax.set_xticklabels(np.append(x_tick_labels, label), rotation=0)
-        if SHOW_Y_LABEL:
-            ax.set_ylabel('{0} (\%)'.format(performance_measure.replace(
-                '_', ' ')))
-        ax.set_ylim((ymin, ymax))
-        if y_major_ticks is not None:
-            ax.set_yticks(y_major_ticks)
-        ax.set_aspect(0.08)
-
-        return ax
 
     def scatter_electrode_contributions(
         self, plot_style='no brain', LABEL=False, SAVE=True, suffix='',
@@ -995,8 +955,9 @@ class ResultsPlotter():
     def bar_plot_electrode_contributions(self, SHOW_Y_TICK_LABELS=True):
 
         # save as:
-        figure_name = 'bar_anatomical_contributions'
-
+        plot_type = 'barplot'
+        figure_name = '_'.join(['anatomical_contributions', plot_type])
+        
         # parcel out the contributions by anatomical area
         boolean_indices = (np.array(self.anatomy_labels, ndmin=2) ==
                            np.array(self.anatomy_grand_list, ndmin=2).T)
@@ -1059,7 +1020,8 @@ class ResultsPlotter():
     ):
 
         # init
-        figure_name = 'kernel_density_anatomical_contributions'
+        plot_type = 'kdeplot'
+        figure_name = '_'.join(['anatomical_contributions', plot_type])
         minor_contribution_areas = []
         sns.set(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
@@ -1108,10 +1070,10 @@ class ResultsPlotter():
 
         # draw the densities in a few steps
         facet_grid.map(
-            sns.kdeplot, 'contributions', clip=[0, 1.0], shade=True,
+            getattr(sns, plot_type), 'contributions', clip=[0, 1.0], shade=True,
             alpha=1, lw=1.5, bw_adjust=bw_adjust, vertical=VERTICAL)
         facet_grid.map(
-            sns.kdeplot, 'contributions', clip=[0, 1.0], color="w",
+            getattr(sns, plot_type), 'contributions', clip=[0, 1.0], color="w",
             lw=2, bw_adjust=bw_adjust, vertical=VERTICAL)
         facet_grid.map(ax_line, **ax_line_kwargs, lw=2, clip_on=False)
         facet_grid.map_dataframe(
@@ -1156,21 +1118,21 @@ class ResultsPlotter():
 
         facet_grid.savefig(self.png_partial_path.format(figure_name), dpi=400)
 
-    def box_plot_electrode_contributions(
-        self, SHOW_X_TICK_LABELS=True, VIOLIN=False
+    def plot_electrode_contributions(
+        self, SHOW_X_TICK_LABELS=True, plot_type='boxplot'
     ):
+        ##############
+        # Is it possible to fold kernel_density_plot_electrode_contributions
+        #  and bar_plot_electrode_contributions into this?
+        ##############
 
         # init
-        if VIOLIN:
-            plot_type = 'violin'
+        if plot_type == 'violinplot':
             kwargs = {'inner': None, 'bw': 1.0, 'width': 1.0}
-            plotter = sns.violinplot
-        else:
-            plot_type = 'box'
+        elif plot_type == 'boxplot':
             kwargs = {'showfliers': False}
-            plotter = sns.boxplot
 
-        figure_name = '{0}_plot_anatomical_contributions'.format(plot_type)
+        figure_name = '_'.join([anatomical_contributions, plot_type])
         minor_contribution_areas = []
         sns.set(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
@@ -1191,7 +1153,7 @@ class ResultsPlotter():
 
         # ...
         fig, ax = plt.subplots(figsize=(8, 3))
-        ax = plotter(
+        ax = getattr(sns, plot_type)(
             x='areas', y='contributions', data=df, palette=palette,
             order=self.anatomy_grand_list, ax=ax, **kwargs)
         sns.stripplot(
@@ -1581,17 +1543,18 @@ class ResultsMatrix:
         return (np.nanvar(self.data, axis=0, ddof=1)/self.data.shape[0])**(1/2)
 
 
-def plot_performance_vs_amount_of_training_data(
+def plot_performances_vs_amount_of_training_data(
     plotters_list, performance_measures=['word_error_rate', 'accuracy'],
     x_major_ticks=np.arange(0, 41, 10), y_major_ticks=np.arange(6)/5,
     ymin=0.0, ymax=100.0, extra_axis_parameters=None,
     pre_tikzpicture_lines=None, extra_body_parameters=None,
     fig_num=0, versus='minutes', title=None, line_style_dict=None,
-    line_color_legend_loc=1, line_style_legend_loc=9, INCLUDE_LEGEND=True
+    line_color_legend_loc=1, line_style_legend_loc=9, INCLUDE_LEGEND=True,
+    file_infix=None,
 ):
 
     # save as:
-    file_suffix = 'vs_{0}'.format(versus)
+    file_suffix = 'vs_{0}'.format(versus.replace(' ', '_'))
     png_partial_path = get_save_path('png', plotters_list)
     tikz_partial_path = get_save_path('tikz', plotters_list)
 
@@ -1671,9 +1634,13 @@ def plot_performance_vs_amount_of_training_data(
                 subject_dummy_line_dict.keys(), loc=line_color_legend_loc)
             axes.add_artist(subject_legend)
 
+        # save
+        file_name = '_'.join(filter(
+            lambda s: s is not None,
+            [performance_measure, file_infix, file_suffix]
+        ))
         tpl_save(
-            filepath=tikz_partial_path.format(
-                '_'.join([performance_measure, file_suffix])),
+            filepath=tikz_partial_path.format(file_name),
             extra_axis_parameters=extra_axis_parameters,
             pre_tikzpicture_lines=pre_tikzpicture_lines,
             extra_body_parameters=extra_body_parameters,
@@ -1692,7 +1659,7 @@ def plot_performance_vs_amount_of_training_data(
             axes.add_artist(line_style_legend)
 
         plt.savefig(
-            png_partial_path.format('_'.join([performance_measure, file_suffix])),
+            png_partial_path.format(file_name),
             bbox_inches='tight', dpi=400
         )
         ##########
@@ -1703,145 +1670,102 @@ def plot_performance_vs_amount_of_training_data(
     return plt
 
 
-def plot_performance_with_all_data(
+def plot_annotated_performances(
     plotters_list, performance_measures=['word_error_rate', 'accuracy'],
-    fig_num=0, file_suffix=None, y_major_ticks=None, ymin=0.0, ymax=100.0,
-    title=None, comparisons=None, BOLD_FIRST_LABEL=False, BOXPLOT=False,
+    plot_types=['boxplot'], fig_num=0, file_suffix=None, y_major_ticks=None,
+    ymin=0.0, ymax=100.0, title=None, comparisons=None, BOLD_FIRST_LABEL=False,
     VERBOSE=True
 ):
 
-    # annotation properties
-    barh = 0.035
-    dh = 0.025
-    ceiling = (1.0 - barh - dh)*(ymax - ymin)
-    floor = (barh + dh)*(ymax - ymin)
-
     # save as:
     if file_suffix is None:
-        file_suffix = 'boxplot_all_data' if BOXPLOT else 'bar_all_data'
+        file_suffix = 'all_data'
     tikz_partial_path = get_save_path('tikz', plotters_list)
 
-    # for each subject
-    for iPlot, performance_measure in enumerate(performance_measures):
-        if BOXPLOT:
-            ax = boxplot_results_with_all_data(
-                plotters_list, performance_measure, fig_num+iPlot,
-                y_major_ticks=y_major_ticks, ymin=ymin, ymax=ymax,
-                BOLD_FIRST_LABEL=BOLD_FIRST_LABEL
-            )
-        else:
-            for x_pos, plotter in enumerate(plotters_list):
-                ax = plotter.bar_plot_performance_with_all_data(
-                    performance_measure, x_pos, fig_num+iPlot, x_pos == 0,
-                    y_major_ticks=y_major_ticks, ymin=ymin, ymax=ymax,
-                    BOLD_LABEL=(x_pos==0) & BOLD_FIRST_LABEL)
-
-        if comparisons is not None:
-
-            # for p-value annotation
-            def application_fxn(
-                baseline_results, comparison_results,
-                baseline_suffix, comparison_suffix,
-            ):
-
-                # [p.get_height() for p in ax.patches],
-                heights = (
-                    [c.get_paths()[0].vertices[1, 1] for c in ax.collections]
-                    if ax.collections else [0]*len(plotters_list)
-                )
-                depths = [np.inf]*len(plotters_list)
-
-                for line_obj in ax.lines:
-                    for x, y in zip(*line_obj.get_data()):
-                        # some lines are off-center
-                        x = int(round(x))
-                        heights[x] = max(heights[x], y)
-                        depths[x] = min(depths[x], y)
-
-                extrema = heights
-                ABOVE = True
-                if any([height > ceiling for height in heights]):
-                    if all([depth > floor for depth in depths]):
-                        extrema = depths
-                        ABOVE = False
-
-                # get the locations *in the plot* of the results to be compared
-                x0 = [iPlotter for iPlotter, plotter in enumerate(plotters_list)
-                      if plotter.suffix == baseline_suffix][0]
-                x1 = [iPlotter for iPlotter, plotter in enumerate(plotters_list)
-                      if plotter.suffix == comparison_suffix][0]
-
-                barplot_annotate_brackets(
-                    x0, x1, comparisons[comparison_suffix][baseline_suffix][
-                        'adjusted p value'],
-                    range(len(plotters_list)),
-                    extrema,
-                    ABOVE=ABOVE,
-                    barh=barh,
-                    dh=dh,
-                    # dh=annotation_offsets[key],
-                    max_asterisk=3
-                )
-
-            ##################
-            # This is kind of a hack:  Here you assume that all results have
-            #  the same subnet_id and saved_results_dir.  It's not as bad as
-            #  it looks: this is actually already built into apply_comparisons,
-            #  and the json files you build to hold your comparisons.  But
-            #  ideally you would be able to make comparisons *across* these
-            #  variables.
-            # NB that you can *plot* across these vars, just not in conjunction
-            #  with comparisons not set to None.
-            saved_results_partial_path = os.path.join(
-                plotters_list[0].saved_results_dir,
-                'perf_vs_training_size_{0}_{1}.hkl'
-            ).format(plotters_list[0].subject.subnet_id, '%s')
-            ###############
-            apply_comparisons(
-                saved_results_partial_path,
-                comparisons,
-                application_fxn,
-                VERBOSE,
-            )
-
-    # write to tikz
+    # for writing to tikz
     extra_axis_parameters = {
         'xticklabel style={align=center, text width=50}',
-        'every x tick label/.append style={rotate=90}',
+        'every x tick label/.append style={rotate=\\xticklabelangle}',
         'yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=2}',
         'xticklabel style={align=right}',
         'width=\\figwidth',
         'height=\\figheight'
     }
     pre_tikzpicture_lines = {
-        '\\providecommand{\\figwidth}{360pt}'
-        '\\providecommand{\\figheight}{310pt}'
-        '\\linespread{0}'
+        '\\providecommand{\\figwidth}{360pt}',
+        '\\providecommand{\\figheight}{310pt}',
+        '\\providecommand{\\xticklabelangle}{90}',
+        '\\linespread{0}',
     }
-    for iPlot, performance_measure in enumerate(performance_measures):
-        plt.figure(fig_num+iPlot)
-        plt.title(title)
 
-        # plt.tight_layout()
-        tpl_save(
-            filepath=tikz_partial_path.format(
-                '_'.join([performance_measure, file_suffix])),
-            extra_axis_parameters=extra_axis_parameters,
-            pre_tikzpicture_lines=pre_tikzpicture_lines,
-            # strict=True,
-        )
+    # for each subject
+    for iPlot, performance_measure in enumerate(performance_measures):
+        for jPlot, plot_type in enumerate(plot_types):
+            kPlot = iPlot*len(performance_measures) + jPlot
+            ax = plot_performance(
+                plotters_list, performance_measure, plot_type, fig_num+kPlot,
+                y_major_ticks=y_major_ticks, ymin=ymin, ymax=ymax,
+                BOLD_FIRST_LABEL=BOLD_FIRST_LABEL
+            )
+
+            if comparisons is not None:
+
+                def application_fxn(
+                    baseline_results, comparison_results,
+                    baseline_suffix, comparison_suffix,
+                ):
+                    return pvalue_annotate(
+                        baseline_results, comparison_results,
+                        baseline_suffix, comparison_suffix,
+                        comparisons, ax, plotters_list, ymax, ymin
+                    )
+
+                ##################
+                # This is kind of a hack:  Here you assume that all results have
+                #  the same subnet_id and saved_results_dir.  It's not as bad as
+                #  it looks: this is actually already built into apply_comparisons,
+                #  and the json files you build to hold your comparisons.  But
+                #  ideally you would be able to make comparisons *across* these
+                #  variables.
+                # NB that you can *plot* across these vars, just not in conjunction
+                #  with comparisons not set to None.
+                saved_results_partial_path = os.path.join(
+                    plotters_list[0].saved_results_dir,
+                    'perf_vs_training_size_{0}_{1}.hkl'
+                ).format(plotters_list[0].subject.subnet_id, '%s')
+                ###############
+                apply_comparisons(
+                    saved_results_partial_path,
+                    comparisons,
+                    application_fxn,
+                    VERBOSE,
+                )
+
+            # plot
+            plt.figure(fig_num+kPlot)
+            plt.title(title)
+
+            # write to tikz
+            # plt.tight_layout()
+            tpl_save(
+                filepath=tikz_partial_path.format(
+                    '_'.join([performance_measure, file_suffix, plot_type])),
+                extra_axis_parameters=extra_axis_parameters,
+                pre_tikzpicture_lines=pre_tikzpicture_lines,
+                # strict=True,
+            )
 
     return ax
 
 
-def boxplot_results_with_all_data(
-    plotters_list, performance_measure, fig_num=0, y_major_ticks=None,
-    ymin=0.0, ymax=100.0, BOLD_FIRST_LABEL=False
+def plot_performance(
+    plotters_list, performance_measure, plot_type, fig_num=0,
+    y_major_ticks=None, ymin=0.0, ymax=100.0, BOLD_FIRST_LABEL=False
 ):
 
     ######
     # TO DO:
-    #   (1) Use these: y_major_ticks, ymin, ymax
+    #   (1) Use y_major_ticks
     ######
 
     # remember to label it as percent (note multiplication by 100 below)
@@ -1863,7 +1787,23 @@ def boxplot_results_with_all_data(
             for WER in getattr(plotter, performance_measure).data
         ]
     })
-    ax = sns.boxplot(
+    palette = {
+        suffix_to_label(
+            plotter.suffix,
+            (plotter == plotters_list[0]) & BOLD_FIRST_LABEL
+        ): plotter.RGB_color
+        for plotter in plotters_list
+    }
+
+    kwargs = {}
+    if plot_type in ['violinplot', 'barplot', 'boxplot']:
+        kwargs.update({'palette': palette})
+    if plot_type == 'violinplot':
+        kwargs.update({'inner': 'stick'})
+    elif plot_type == 'swarmplot':
+        kwargs.update({'color': ".25"})
+
+    ax = getattr(sns, plot_type)(
         x='label', y=measure_name, data=df,
         order=[
             suffix_to_label(
@@ -1872,19 +1812,63 @@ def boxplot_results_with_all_data(
             )
             for plotter in plotters_list
         ],
-        palette={
-            suffix_to_label(
-                plotter.suffix,
-                (plotter == plotters_list[0]) & BOLD_FIRST_LABEL
-            ): plotter.RGB_color
-            for plotter in plotters_list
-        }
+        **kwargs
     )
     ax.set(xlabel='')
     ax.set_ylim([ymin, ymax])
 
     return ax
 
+# for p-value annotation
+def pvalue_annotate(
+    baseline_results, comparison_results, baseline_suffix, comparison_suffix,
+    comparisons, ax, plotters_list, ymax, ymin
+):
+
+    # annotation properties
+    barh = 0.035
+    dh = 0.025
+    ceiling = (1.0 - barh - dh)*(ymax - ymin)
+    floor = (barh + dh)*(ymax - ymin)
+
+    # [p.get_height() for p in ax.patches],
+    heights = (
+        [c.get_paths()[0].vertices[1, 1] for c in ax.collections]
+        if ax.collections else [0]*len(plotters_list)
+    )
+    depths = [np.inf]*len(plotters_list)
+
+    for line_obj in ax.lines:
+        for x, y in zip(*line_obj.get_data()):
+            # some lines are off-center
+            x = int(round(x))
+            heights[x] = max(heights[x], y)
+            depths[x] = min(depths[x], y)
+
+    extrema = heights
+    ABOVE = True
+    if any([height > ceiling for height in heights]):
+        if all([depth > floor for depth in depths]):
+            extrema = depths
+            ABOVE = False
+
+    # get the locations *in the plot* of the results to be compared
+    x0 = [iPlotter for iPlotter, plotter in enumerate(plotters_list)
+          if plotter.suffix == baseline_suffix][0]
+    x1 = [iPlotter for iPlotter, plotter in enumerate(plotters_list)
+          if plotter.suffix == comparison_suffix][0]
+
+    barplot_annotate_brackets(
+        x0, x1, comparisons[comparison_suffix][baseline_suffix][
+            'adjusted p value'],
+        range(len(plotters_list)),
+        extrema,
+        ABOVE=ABOVE,
+        barh=barh,
+        dh=dh,
+        # dh=annotation_offsets[key],
+        max_asterisk=3
+    )
 
 def get_save_path(fig_type, plotters_list):
 
