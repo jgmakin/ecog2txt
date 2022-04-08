@@ -381,6 +381,10 @@ class ECoGDataGenerator:
 
         target_list = []
         for block in block_set:
+            # wtf?
+            # if block == 46:
+            #     pass
+
             data_path = self.tf_record_partial_path.format(block)
             if not os.path.exists(data_path):
                 self._write_to_Protobuf(block)

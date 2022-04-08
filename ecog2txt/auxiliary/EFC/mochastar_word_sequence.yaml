@@ -118,7 +118,7 @@
   - vSMC
   assessment_epoch_interval: 10
   audio_sequence_penalty_scale: 0.1
-  azimuth: 0
+  azimuth: 180
   bad_electrodes_path: /home/makin/data/ecog/EFC401/bad_electrodes
   beam_width: 1
   block_descriptors:
@@ -143,7 +143,7 @@
     encoder_1_targets: phoneme_sequence
     encoder_inputs: ecog_sequence
   decimation_factor: null
-  electrode_path: /home/makin/ecog/EFC401/TDT_elecs_all.mat
+  electrode_path: /home/makin/data/ecog/EFC401/TDT_elecs_all.mat
   elevation: 0
   encoder_1_targets_penalty_scale: 1.0
   grid_names:
@@ -173,7 +173,7 @@
   num_mel_features: 26
   num_unique_training_sentences: null
   phoneme_sequence_vocab_file: vocab.phonemes.42
-  png_partial_path: /home/makin/DSftHC/word_sequence/EFC401/{0}.png
+  png_partial_path: /home/makin/figures/word_sequence/EFC401/{0}.png
   project: EFC
   sampling_rate: 200
   sampling_rate_decimated: 16.5
@@ -236,7 +236,7 @@
     encoder_1_targets: phoneme_sequence
     encoder_inputs: ecog_sequence
   decimation_factor: null
-  electrode_path: /home/makin/data.ecog/EFC402/TDT_elecs_all.mat
+  electrode_path: /home/makin/data/ecog/EFC402/TDT_elecs_all.mat
   elevation: 10
   encoder_1_targets_penalty_scale: 1.0
   grid_names:
@@ -329,7 +329,7 @@
     encoder_1_targets: phoneme_sequence
     encoder_inputs: ecog_sequence
   decimation_factor: null
-  electrode_path: /home/makin/data/EFC403/TDT_elecs_all.mat
+  electrode_path: /home/makin/data/ecog/EFC403/TDT_elecs_all.mat
   elevation: 0
   encoder_1_targets_penalty_scale: 1.0
   grid_names:

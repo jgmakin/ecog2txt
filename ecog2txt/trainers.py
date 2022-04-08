@@ -767,9 +767,9 @@ class MultiSubjectTrainer:
                     )
 
                 # get the encoder state
-                get_final_state, _, _, _, _ = self.net._encode_sequences(
-                    GPU_op_dict['encoder_inputs'], subnet_params, 0.0, 0.0,
-                    set_initial_ind=0)
+                _, get_final_state, _, _ = self.net._encode_sequences(
+                    GPU_op_dict, subnet_params, 0.0, 0.0, set_initial_ind=0,
+                )
 
             # give names to these so you can recover them later
             decimate_reversed_targets = tf.identity(
@@ -813,6 +813,10 @@ class MultiSubjectTrainer:
 
         NB: this method *does* reshape flattened ECoG data, but does *not*
         substitute indices for strings.
+
+        USAGE: 
+            for example in trainer.tf_record_to_numpy_data(401, 4):
+                print(example.keys())
         '''
 
         tf.compat.v1.reset_default_graph()
@@ -864,7 +868,6 @@ class MultiSubjectTrainer:
                     yield sess.run(sequenced_op_dict)
                 except tf.errors.OutOfRangeError:
                     break
-        #return sequence_data
 
 
 def construct_online_predictor(

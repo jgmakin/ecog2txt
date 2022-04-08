@@ -75,8 +75,11 @@ class ECoGSubject:
         # these attribute *will* be accessed by a SequenceNet
         self.target_specs = dict(target_specs)
         self.data_manifests = {
-            data_key: SequenceDataManifest(sequence_type)
-            for data_key, sequence_type in self.data_mapping.items()
+            data_key:
+            SequenceDataManifest(**data_manifest_kwargs)
+            if type(data_manifest_kwargs) is dict else
+            SequenceDataManifest(data_manifest_kwargs)
+            for data_key, data_manifest_kwargs in self.data_mapping.items()
         }
 
     # ATTRIBUTES THAT WILL *NOT* BE ACCESSED BY A SequenceNet

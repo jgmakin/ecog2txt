@@ -1,3 +1,4 @@
+# standard libraries
 import os
 import pdb
 import sys
@@ -1250,8 +1251,10 @@ class ResultsPlotter():
 
         # ...
         iSequence = 0  # why not
-        data_list = [assessments['validation'].reversed_inputs,
-                     assessments['validation'].convolved_inputs]
+        data_list = [
+            assessments['validation'].reversed_inputs,
+            assessments['validation'].convolved_inputs,
+        ]
         signal_names = ['ECoG', 'conv_layer']
         t0s = [N*6, N*10]
         tFs = [N*16, N*11]
@@ -1296,18 +1299,28 @@ class ResultsPlotter():
                     data_prev[iSequence], filter_cmap_name, t0, tF, num_channels_prev,
                     decimation_factor_prev, e0_prev, 0, yticks
                 )
+                ylim = ax.get_ylim()
+                ylen = np.diff(ylim)[0]
                 rect = mpl.patches.Rectangle(
-                    (t0, ax.get_ylim()[0]), tF-t0, np.diff(ax.get_ylim())[0],
-                    linewidth=4, edgecolor='green', facecolor='none',
-                    label='_nolegend_'
+                    (t0, ylim[0]), tF-t0, ylen, linewidth=4,
+                    edgecolor='green', facecolor='none', label='_nolegend_'
                 )
                 ax.add_patch(rect)
-                ax.set_axis_off()
                 tpl_save(filepath=self.tikz_partial_path.format(fig_name))
+
+                # plot with square rather than rectangle
+                rect.remove()
+                rect = mpl.patches.Rectangle(
+                    (t0, ylim[0]+0.2*ylen), tF-t0, ylim[0]+0.3*ylen, linewidth=4,
+                    edgecolor='green', facecolor='none', label='_nolegend_'
+                )
+                ax.add_patch(rect)
+                tpl_save(filepath=self.tikz_partial_path.format(fig_name + '_with_square'))
 
             # now set up the *current* figure
             fig = plt.figure()
             ax = fig.get_axes()[0] if fig.get_axes() else fig.add_subplot(111)
+            ax.set_axis_off()
 
             # plot all signals
             yticks = offset*np.arange(num_channels)
@@ -1343,8 +1356,10 @@ class ResultsPlotter():
             data_prev = data
             fig_name = signal_name + '_example'
 
+            if signal_name == signal_names[0]:
+                tpl_save(filepath=self.tikz_partial_path.format(fig_name + '_without_window'))
+
         # save the last figure
-        ax.set_axis_off()
         tpl_save(filepath=self.tikz_partial_path.format(fig_name))
 
         # also plot encoder final state
@@ -1843,7 +1858,10 @@ def pvalue_annotate(
             # some lines are off-center
             x = int(round(x))
             heights[x] = max(heights[x], y)
-            depths[x] = min(depths[x], y)
+            try:
+                depths[x] = min(depths[x], y)
+            except:
+                pdb.set_trace()
 
     extrema = heights
     ABOVE = True
