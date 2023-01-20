@@ -65,8 +65,14 @@ class DecodingResults:
                 # HACK for backward compatibility with old code structure:
                 #  a function may have been saved in the hickle file.
                 sys.modules['pycode.ecog2txt'] = ecog2txt
+                ########
+                # A hack for a hack--required for later versions of sys...
+                sys.modules['pycode'] = ecog2txt
+                ########
                 with open(decoding_results_file_name, 'r') as fp:
+                    pdb.set_trace()
                     hickled_data = hickle.load(fp)
+
 
             # for some results, you saved a list of the training_blocks sets
             blocks = np.array(hickled_data[0]['training_blocks'])

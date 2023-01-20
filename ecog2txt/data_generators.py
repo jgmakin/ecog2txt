@@ -182,8 +182,10 @@ class ECoGDataGenerator:
             with open(self.bad_electrodes_path, 'r') as f:
                 bad_electrodes = f.readlines()
             bad_electrodes = [int(e.strip()) for e in bad_electrodes]
-            return (set(range(np.prod(self.grid_size))) -
-                    set(np.array(bad_electrodes)-1))
+            return (
+                set(range(np.prod(self.grid_size))) -
+                set(np.array(bad_electrodes)-1)
+            )
         else:
             return self._good_electrodes
 
@@ -304,7 +306,7 @@ class ECoGDataGenerator:
 
         # some information
         print('\n\n')
-        print('WARNING: %i of %i sequences ' % (num_clipped, i_example))
+        print('WARNING: %i of %i sequences' % (num_clipped, i_example), end='')
         print(' (%.2f%%) have been clipped' % (100*num_clipped/i_example))
 
         return output_dict
@@ -367,8 +369,10 @@ class ECoGDataGenerator:
                     (features, np.log(energy)[:, None]), axis=1)
 
             # use deltas?
-            mfccs = (np.concatenate((features, delta(features, N=2)), axis=1)
-                     if self.USE_MFCC_DELTAS else features)
+            mfccs = (
+                np.concatenate((features, delta(features, N=2)), axis=1)
+                if self.USE_MFCC_DELTAS else features
+            )
 
             return mfccs
 
