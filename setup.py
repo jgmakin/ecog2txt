@@ -34,7 +34,7 @@ setuptools.setup(
         'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
         'python_speech_features', 'pyyaml', 'hickle==3.4.6',
         # 'protobuf==3.7',
-        'protobuf==3.12.2',
+        'protobuf==3.18.3',
         'tensor2tensor==1.15.7', 'tensorflow-probability==0.7',
         # 'samplerate',
         # 'tensorflow-gpu==1.15.3'  # the cpu version will also work
