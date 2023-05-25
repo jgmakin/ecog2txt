@@ -154,7 +154,7 @@
 		"93": {"type": "picture_description_tree_reduced_mimed", "default_dataset": "training"},
 		"94": {"type": "picture_description_tree_reduced_mimed", "default_dataset": "training"},
 		"95": {"type": "picture_description_birthday_reduced_mimed", "default_dataset": "training"},
-		"96": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "defective"},
+		"96": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "corrupted"},
 		"97": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},
 		"98": {"type": "picture_description_tree_reduced_mimed", "default_dataset": "training"},
 		"99": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},

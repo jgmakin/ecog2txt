@@ -539,16 +539,21 @@ class MultiSubjectTrainer:
         accuracies_epochs = [epoch for epoch in range(0, max_epoch, plot_interval)]
 
         # save the accuracies to a text file
-        np.savetxt(save_file_path,
-                   np.stack([assessments['training'].decoder_accuracies,
-                             assessments['training'].decoder_word_error_rates,
-                             assessments['validation'].decoder_accuracies,
-                             assessments['validation'].decoder_word_error_rates,
-                             np.array(accuracies_epochs)], axis=1),
-                   fmt="%.4f",
-                   header=('training accs | training WERs | '
-                           'validation acc | validation WERs | epochs')
-                   )
+        np.savetxt(
+            save_file_path,
+            np.stack([
+                assessments['training'].decoder_accuracies,
+                assessments['training'].decoder_word_error_rates,
+                assessments['validation'].decoder_accuracies,
+                assessments['validation'].decoder_word_error_rates,
+                np.array(accuracies_epochs)
+            ], axis=1),
+            fmt="%.4f",
+            header=(
+                'training accs | training WERs | '
+                'validation acc | validation WERs | epochs'
+            )
+        )
 
         # confusion matrix looks bad in tensorboard, so rebuild here
         decoder_targets_list = subject.data_manifests[

@@ -859,7 +859,7 @@ class ResultsPlotter():
                 tpl_save(
                     filepath=self.tikz_partial_path.format(figure_name),
                     extra_axis_parameters={'width=\\figwidth', 'height=\\figheight'},
-                    pre_tikzpicture_lines={
+                    extra_lines_start={
                         '\\providecommand{{\\figwidth}}{{{0}in}}%'.format(
                             self.subject.data_generator.grid_size[0]/2),
                         '\\providecommand{{\\figheight}}{{{0}in}}%'.format(
@@ -1015,7 +1015,7 @@ class ResultsPlotter():
                 'width=\\figwidth',
                 'height=\\figheight'
             },
-            pre_tikzpicture_lines={
+            extra_lines_start={
                 '\\providecommand{\\figwidth}{360pt}%',
                 '\\providecommand{\\figheight}{310pt}%'
             },
@@ -1188,7 +1188,7 @@ class ResultsPlotter():
         tpl_save(
             filepath=self.tikz_partial_path.format(figure_name),
             extra_axis_parameters=extra_axis_parameters,
-            pre_tikzpicture_lines={
+            extra_lines_start={
                 '\\providecommand{\\figwidth}{5.7in}%',
                 '\\providecommand{\\figheight}{2.0in}%',
                 '\\providecommand{\\thisXticklabelopacity}{1.0}%',
@@ -1478,11 +1478,11 @@ class ResultsPlotter():
             'every x tick label/.append style={rotate=90}',
             'every axis y label/.append style={opacity=\\thisYlabelopacity}'
         }
-        pre_tikzpicture_lines = {'\\providecommand{\\thisYlabelopacity}{1.0}'}
+        extra_lines_start = {'\\providecommand{\\thisYlabelopacity}{1.0}'}
         tpl_save(
             filepath=self.tikz_partial_path.format('data_distribution'),
             extra_axis_parameters=extra_axis_parameters,
-            pre_tikzpicture_lines=pre_tikzpicture_lines
+            extra_lines_start=extra_lines_start
         )
     ############
 
@@ -1568,7 +1568,7 @@ def plot_performances_vs_amount_of_training_data(
     plotters_list, performance_measures=['word_error_rate', 'accuracy'],
     x_major_ticks=np.arange(0, 41, 10), y_major_ticks=np.arange(6)/5,
     ymin=0.0, ymax=100.0, extra_axis_parameters=None,
-    pre_tikzpicture_lines=None, extra_body_parameters=None,
+    extra_lines_start=None, extra_body_parameters=None,
     fig_num=0, versus='minutes', title=None, line_style_dict=None,
     line_color_legend_loc=1, line_style_legend_loc=9, INCLUDE_LEGEND=True,
     file_infix=None,
@@ -1595,12 +1595,12 @@ def plot_performances_vs_amount_of_training_data(
         'width=\\figwidth',
         'height=\\figheight',
     } | extra_axis_parameters
-    if pre_tikzpicture_lines is None:
-        pre_tikzpicture_lines = set()
-    pre_tikzpicture_lines = {
+    if extra_lines_start is None:
+        extra_lines_start = set()
+    extra_lines_start = {
         '\\providecommand{\\figwidth}{360pt}',
         '\\providecommand{\\figheight}{310pt}',
-    } | pre_tikzpicture_lines
+    } | extra_lines_start
 
     # recreate tikzplotlib color names
     tikz_color_names = {}
@@ -1663,7 +1663,7 @@ def plot_performances_vs_amount_of_training_data(
         tpl_save(
             filepath=tikz_partial_path.format(file_name),
             extra_axis_parameters=extra_axis_parameters,
-            pre_tikzpicture_lines=pre_tikzpicture_lines,
+            extra_lines_start=extra_lines_start,
             extra_body_parameters=extra_body_parameters,
             strict=True,
         )
@@ -1712,7 +1712,7 @@ def plot_annotated_performances(
         'width=\\figwidth',
         'height=\\figheight'
     }
-    pre_tikzpicture_lines = {
+    extra_lines_start = {
         '\\providecommand{\\figwidth}{360pt}',
         '\\providecommand{\\figheight}{310pt}',
         '\\providecommand{\\xticklabelangle}{90}',
@@ -1772,7 +1772,7 @@ def plot_annotated_performances(
                 filepath=tikz_partial_path.format(
                     '_'.join([performance_measure, file_suffix, plot_type])),
                 extra_axis_parameters=extra_axis_parameters,
-                pre_tikzpicture_lines=pre_tikzpicture_lines,
+                extra_lines_start=extra_lines_start,
                 # strict=True,
             )
 
