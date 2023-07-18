@@ -32,9 +32,11 @@ setuptools.setup(
         'numpy==1.22.4',
         'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
         'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
-        'python_speech_features', 'pyyaml', 'hickle==3.4.6',
+        'python_speech_features', 'pyyaml',
+        # tensorflow won't like this; ignore it
+        'hickle==5.0.2',
         # 'protobuf==3.7',
-        'protobuf==3.12.2',
+        'protobuf==3.20.3',
         'tensor2tensor==1.15.7', 'tensorflow-probability==0.7',
         # 'samplerate',
         # 'tensorflow-gpu==1.15.3'  # the cpu version will also work

@@ -1,6 +1,5 @@
 400:
-  DataGenerator: &id001 !!python/name:ecog2txt.data_generators.ECoGDataGenerator ''
-  # DataGenerator: &id001 !!python/name:ecog2txt.chang_lab_data_generators.BambooDataGenerator ''
+  DataGenerator: &id001 !!python/name:ecog2txt.makin_lab_data_generators.SpeechDataGenerator ''
   EMA_decay: 0.99
   FF_dropout: 0.1
   Nepochs: 800

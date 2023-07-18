@@ -1,174 +1,1540 @@
 {
-	"400": {
-		"3": {"type": "mocha-1", "default_dataset": "training"},
-		"4": {"type": "mocha-2", "default_dataset": "training"},
-		"6": {"type": "mocha-3", "default_dataset": "training"},
-		"8": {"type": "mocha-4", "default_dataset": "training"},
-		"10": {"type": "mocha-5", "default_dataset": "training"},
-		"12": {"type": "mocha-6", "default_dataset": "training"},
-		"14": {"type": "mocha-7", "default_dataset": "training"},
-		"15": {"type": "mocha-8", "default_dataset": "training"},
-		"19": {"type": "mocha-9", "default_dataset": "training"},
-		"23": {"type": "mocha-1", "default_dataset": "training"},
-		"28": {"type": "mocha-2", "default_dataset": "training"},
-		"30": {"type": "mocha-3", "default_dataset": "training"},
-		"38": {"type": "mocha-4", "default_dataset": "training"},
-		"40": {"type": "mocha-5", "default_dataset": "training"},
-		"42": {"type": "mocha-6", "default_dataset": "training"},
-		"46": {"type": "mocha-7", "default_dataset": "training"},
-		"57": {"type": "mocha-8", "default_dataset": "training"},
-		"61": {"type": "mocha-9", "default_dataset": "training"},
-		"72": {"type": "mocha-1", "default_dataset": "validation"},
-		"73": {"type": "mocha-2", "default_dataset": "extra"},
-		"82": {"type": "mocha-3", "default_dataset": "extra"}
-	},
-	"401": {
-		"4": {"type": "mocha-1", "default_dataset": "training"},
-		"6": {"type": "mocha-2", "default_dataset": "training"},
-		"8": {"type": "mocha-3", "default_dataset": "training"},
-		"12": {"type": "mocha-4", "default_dataset": "training"},
-		"17": {"type": "mocha-5", "default_dataset": "training"},
-		"18": {"type": "mocha-6", "default_dataset": "training"},
-		"20": {"type": "mocha-7", "default_dataset": "training"},
-		"32": {"type": "mocha-8", "default_dataset": "training"},
-		"34": {"type": "mocha-9", "default_dataset": "training"},
-		"41": {"type": "mocha-1", "default_dataset": "training"},
-		"57": {"type": "mocha-1", "default_dataset": "training"},
-		"61": {"type": "mocha-1", "default_dataset": "training"},
-		"66": {"type": "mocha-1", "default_dataset": "training"},
-		"69": {"type": "mocha-1", "default_dataset": "training"},
-		"73": {"type": "mocha-1", "default_dataset": "training"},
-		"77": {"type": "mocha-1", "default_dataset": "training"},
-		"83": {"type": "mocha-1", "default_dataset": "validation"},
-		"87": {"type": "mocha-1", "default_dataset": "testing"}
-	},
-	"402": {
-		"3": {"type": "demo_2_sentences", "default_dataset": "training"},
-		"4": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"5": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"6": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"7": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"8": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"9": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"11": {"type": "mocha-1", "default_dataset": "validation"},
-		"12": {"type": "mocha-2", "default_dataset": "training"},
-		"13": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"14": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"15": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"16": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"17": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"18": {"type": "picture_description_birthday_reduced", "default_dataset": "training"},
-		"19": {"type": "picture_description_tree_reduced", "default_dataset": "training"},
-		"20": {"type": "mocha-3", "default_dataset": "training"},
-		"21": {"type": "mocha-4", "default_dataset": "training"},
-		"22": {"type": "mocha-5", "default_dataset": "training"},
-		"25": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"26": {"type": "picture_description_tree_reduced", "default_dataset": "training"},
-		"27": {"type": "picture_description_birthday_reduced", "default_dataset": "training"},
-		"28": {"type": "mocha-6", "default_dataset": "training"},
-		"29": {"type": "mocha-7", "default_dataset": "training"},
-		"30": {"type": "mocha-8", "default_dataset": "training"},
-		"31": {"type": "mocha-9", "default_dataset": "training"},
-		"33": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"34": {"type": "picture_description_birthday_reduced", "default_dataset": "training"},
-		"35": {"type": "picture_description_tree_reduced", "default_dataset": "training"},
-		"41": {"type": "mocha-1", "default_dataset": "training"},
-		"44": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"45": {"type": "picture_description_kitchen_reduced", "default_dataset": "validation"},
-		"46": {"type": "picture_description_birthday_reduced", "default_dataset": "validation"},
-		"47": {"type": "picture_description_tree_reduced", "default_dataset": "validation"},
-		"48": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"49": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"50": {"type": "mocha-2", "default_dataset": "training"},
-		"51": {"type": "mocha-3", "default_dataset": "training"},
-		"52": {"type": "mocha-4", "default_dataset": "training"},
-		"53": {"type": "mocha-5", "default_dataset": "training"},
-		"54": {"type": "mocha-6", "default_dataset": "training"},
-		"55": {"type": "mocha-7", "default_dataset": "training"},
-		"56": {"type": "mocha-8", "default_dataset": "testing"},
-		"57": {"type": "mocha-9", "default_dataset": "testing"},
-		"58": {"type": "picture_description_kitchen_reduced", "default_dataset": "testing"},
-		"59": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},
-		"60": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"}
-	},
-	"403": {
-		"3": {"type": "mocha-1", "default_dataset": "training"},
-		"4": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"5": {"type": "interview", "default_dataset": "training"},
-		"6": {"type": "mocha-2", "default_dataset": "training"},
-		"7": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"8": {"type": "picture_description", "default_dataset": "training"},
-		"9": {"type": "mocha-3", "default_dataset": "training"},
-		"10": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"11": {"type": "interview", "default_dataset": "training"},
-		"12": {"type": "mocha-4", "default_dataset": "training"},
-		"13": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"14": {"type": "picture_description", "default_dataset": "training"},
-		"15": {"type": "mocha-5", "default_dataset": "training"},
-		"17": {"type": "mocha-6", "default_dataset": "training"},
-		"18": {"type": "mocha-7", "default_dataset": "training"},
-		"19": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"20": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"21": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"22": {"type": "mocha-8", "default_dataset": "training"},
-		"27": {"type": "mocha-9", "default_dataset": "training"},
-		"28": {"type": "picture_description_birthday_reduced_mimed", "default_dataset": "training"},
-		"29": {"type": "picture_description", "default_dataset": "training"},
-		"30": {"type": "mocha-1", "default_dataset": "validation"},
-		"33": {"type": "mocha-2", "default_dataset": "training"},
-		"34": {"type": "interview", "default_dataset": "training"},
-		"35": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},
-		"36": {"type": "picture_description", "default_dataset": "training"},
-		"38": {"type": "mocha-3", "default_dataset": "training"},
-		"39": {"type": "picture_description_birthday_reduced_mimed", "default_dataset": "training"},
-		"40": {"type": "mocha-4", "default_dataset": "training"},
-		"41": {"type": "picture_description", "default_dataset": "training"},
-		"42": {"type": "mocha-5", "default_dataset": "training"},
-		"44": {"type": "mocha-6", "default_dataset": "training"},
-		"46": {"type": "mocha-6", "default_dataset": "training"},
-		"48": {"type": "mocha-7", "default_dataset": "training"},
-		"50": {"type": "mocha-8", "default_dataset": "training"},
-		"51": {"type": "mocha-9", "default_dataset": "corrupted"},
-		"52": {"type": "picture_description_tree_reduced", "default_dataset": "validation"},
-		"53": {"type": "picture_description_tree_reduced", "default_dataset": "training"},
-		"54": {"type": "picture_description_kitchen_reduced", "default_dataset": "validation"},
-		"55": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"56": {"type": "picture_description_birthday_reduced", "default_dataset": "validation"},
-		"59": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"60": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"61": {"type": "picture_description_tree_reduced", "default_dataset": "testing"},
-		"62": {"type": "picture_description_birthday_reduced", "default_dataset": "testing"},
-		"63": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"64": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"65": {"type": "mocha-1", "default_dataset": "training"},
-		"66": {"type": "mocha-2", "default_dataset": "extra"},
-		"69": {"type": "mocha-3", "default_dataset": "extra"},
-		"70": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"73": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"74": {"type": "picture_description_kitchen_reduced", "default_dataset": "training"},
-		"75": {"type": "picture_description_tree_reduced", "default_dataset": "training"},
-		"76": {"type": "picture_description_birthday_reduced", "default_dataset": "training"},
-		"77": {"type": "picture_description_tree_reduced", "default_dataset": "training"},
-		"83": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"92": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},
-		"93": {"type": "picture_description_tree_reduced_mimed", "default_dataset": "training"},
-		"94": {"type": "picture_description_tree_reduced_mimed", "default_dataset": "training"},
-		"95": {"type": "picture_description_birthday_reduced_mimed", "default_dataset": "training"},
-		"96": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "corrupted"},
-		"97": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},
-		"98": {"type": "picture_description_tree_reduced_mimed", "default_dataset": "training"},
-		"99": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"},
-		"100": {"type": "picture_description_birthday_reduced_mimed", "default_dataset": "training"},
-		"101": {"type": "picture_description_reduced", "default_dataset": "training"},
-		"102": {"type": "mocha-4", "default_dataset": "extra"},
-		"104": {"type": "mocha-5", "default_dataset": "extra"},
-		"108": {"type": "picture_description_birthday_reduced", "default_dataset": "validation"},
-		"109": {"type": "picture_description_birthday_reduced", "default_dataset": "training"},
-		"110": {"type": "picture_description_tree_reduced", "default_dataset": "validation"},
-		"111": {"type": "picture_description_kitchen_reduced", "default_dataset": "validation"},
-		"112": {"type": "picture_description_birthday_reduced", "default_dataset": "training"},
-		"113": {"type": "picture_description_kitchen_reduced_tiny", "default_dataset": "training"},
-		"114": {"type": "picture_description_kitchen_reduced_tiny", "default_dataset": "training"},
-		"115": {"type": "picture_description_kitchen_reduced_mimed", "default_dataset": "training"}
-	}
+    "397": {
+        "20": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "24": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "40": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "45": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "46": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "48": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "54": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        },
+        "55": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "validation",
+            "type": "mocha-1"
+        },
+        "57": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "58": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "60": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "61": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "63": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "64": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "66": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "67": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        }
+    },
+    "398": {
+        "3": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "4": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "8": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "11": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "12": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "13": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "14": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "15": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "16": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        },
+        "20": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "validation",
+            "type": "mocha-1"
+        },
+        "22": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "27": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "29": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "36": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "38": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "40": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "41": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "42": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        }
+    },
+    "399": {
+        "26": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "27": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "28": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "38": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "39": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "42": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "43": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "46": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        }
+    },
+    "400": {
+        "3": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "4": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "6": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "8": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "10": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "12": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "14": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "15": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "19": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        },
+        "23": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "28": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "30": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "38": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "40": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "42": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "46": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "57": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "61": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        },
+        "72": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "mocha-1"
+        },
+        "73": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "extra",
+            "type": "mocha-2"
+        },
+        "82": {
+            "audio": false,
+            "bipolar": false,
+            "default_dataset": "extra",
+            "type": "mocha-3"
+        }
+    },
+    "401": {
+        "4": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "6": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "8": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "12": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "17": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "18": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "20": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "32": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "34": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        },
+        "41": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "57": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "61": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "66": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "69": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "73": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "77": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "83": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "mocha-1"
+        },
+        "87": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "testing",
+            "type": "mocha-1"
+        }
+    },
+    "402": {
+        "3": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "demo_2_sentences"
+        },
+        "4": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "picture_description_reduced"
+        },
+        "5": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "6": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "7": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "8": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "9": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "11": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "validation",
+            "hour": 16,
+            "type": "mocha-1"
+        },
+        "12": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "mocha-2"
+        },
+        "13": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "14": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "15": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "16": {
+            "audio": true,
+            "bipolar": true,
+            "day": 0,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_reduced"
+        },
+        "17": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "18": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "picture_description_birthday_reduced"
+        },
+        "19": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "picture_description_tree_reduced"
+        },
+        "20": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "mocha-3"
+        },
+        "21": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "mocha-4"
+        },
+        "22": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 11,
+            "type": "mocha-5"
+        },
+        "25": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "26": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "picture_description_tree_reduced"
+        },
+        "27": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "picture_description_birthday_reduced"
+        },
+        "28": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-6"
+        },
+        "29": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-7"
+        },
+        "30": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-8"
+        },
+        "31": {
+            "audio": true,
+            "bipolar": true,
+            "day": 1,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-9"
+        },
+        "33": {
+            "audio": true,
+            "bipolar": true,
+            "day": 2,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "34": {
+            "audio": true,
+            "bipolar": true,
+            "day": 2,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_birthday_reduced"
+        },
+        "35": {
+            "audio": true,
+            "bipolar": true,
+            "day": 2,
+            "default_dataset": "training",
+            "hour": 16,
+            "type": "picture_description_tree_reduced"
+        },
+        "41": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "training",
+            "hour": 13.25,
+            "type": "mocha-1"
+        },
+        "44": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "training",
+            "hour": 13.5,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "45": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "validation",
+            "hour": 13.5,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "46": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "validation",
+            "hour": 13.5,
+            "type": "picture_description_birthday_reduced"
+        },
+        "47": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "validation",
+            "hour": 13.5,
+            "type": "picture_description_tree_reduced"
+        },
+        "48": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "training",
+            "hour": 13.5,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "49": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "training",
+            "hour": 13.5,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "50": {
+            "audio": true,
+            "bipolar": true,
+            "day": 4,
+            "default_dataset": "training",
+            "hour": 14,
+            "type": "mocha-2"
+        },
+        "51": {
+            "audio": true,
+            "bipolar": true,
+            "day": 5,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-3"
+        },
+        "52": {
+            "audio": true,
+            "bipolar": true,
+            "day": 5,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-4"
+        },
+        "53": {
+            "audio": true,
+            "bipolar": true,
+            "day": 5,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-5"
+        },
+        "54": {
+            "audio": true,
+            "bipolar": true,
+            "day": 5,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-6"
+        },
+        "55": {
+            "audio": true,
+            "bipolar": true,
+            "day": 5,
+            "default_dataset": "training",
+            "hour": 15,
+            "type": "mocha-7"
+        },
+        "56": {
+            "audio": false,
+            "bipolar": true,
+            "day": 6,
+            "default_dataset": "testing",
+            "hour": 9,
+            "type": "mocha-8"
+        },
+        "57": {
+            "audio": false,
+            "bipolar": true,
+            "day": 6,
+            "default_dataset": "testing",
+            "hour": 9.3,
+            "type": "mocha-9"
+        },
+        "58": {
+            "audio": true,
+            "bipolar": true,
+            "day": 6,
+            "default_dataset": "testing",
+            "hour": 9.3,
+            "type": "picture_description_kitchen_reduced"
+        },
+        "59": {
+            "audio": true,
+            "bipolar": true,
+            "day": 6,
+            "default_dataset": "training",
+            "hour": 9.3,
+            "type": "picture_description_kitchen_reduced_mimed"
+        },
+        "60": {
+            "audio": true,
+            "bipolar": true,
+            "day": 6,
+            "default_dataset": "training",
+            "hour": 9.3,
+            "type": "picture_description_kitchen_reduced_mimed"
+        }
+    },
+    "403": {
+        "3": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "4": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "5": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "6": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "7": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "8": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description"
+        },
+        "9": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "10": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "11": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "12": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "13": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "14": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description"
+        },
+        "15": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "16": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "17": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "18": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "19": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "20": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "21": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "22": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "25": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "27": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-9"
+        },
+        "28": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced_mimed"
+        },
+        "29": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description"
+        },
+        "30": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "mocha-1"
+        },
+        "31": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "33": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-2"
+        },
+        "34": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "35": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_mimed"
+        },
+        "36": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description"
+        },
+        "37": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "interview"
+        },
+        "38": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-3"
+        },
+        "39": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced_mimed"
+        },
+        "40": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-4"
+        },
+        "41": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description"
+        },
+        "42": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-5"
+        },
+        "44": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "46": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-6"
+        },
+        "47": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "defective",
+            "type": "unknown"
+        },
+        "48": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-7"
+        },
+        "50": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-8"
+        },
+        "51": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "defective",
+            "type": "mocha-9"
+        },
+        "52": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_tree_reduced"
+        },
+        "53": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree_reduced"
+        },
+        "54": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_kitchen_reduced"
+        },
+        "55": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced"
+        },
+        "56": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_birthday_reduced"
+        },
+        "59": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "60": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced"
+        },
+        "61": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "testing",
+            "type": "picture_description_tree_reduced"
+        },
+        "62": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "testing",
+            "type": "picture_description_birthday_reduced"
+        },
+        "63": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "64": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "65": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "mocha-1"
+        },
+        "66": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "extra",
+            "type": "mocha-2"
+        },
+        "69": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "extra",
+            "type": "mocha-3"
+        },
+        "70": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "73": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced"
+        },
+        "74": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced"
+        },
+        "75": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree_reduced"
+        },
+        "76": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced"
+        },
+        "77": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree_reduced"
+        },
+        "83": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "92": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_mimed"
+        },
+        "93": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree_reduced_mimed"
+        },
+        "94": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree_reduced_mimed"
+        },
+        "95": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced_mimed"
+        },
+        "96": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "defective",
+            "type": "picture_description_kitchen_reduced_mimed"
+        },
+        "97": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_mimed"
+        },
+        "98": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree_reduced_mimed"
+        },
+        "99": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_mimed"
+        },
+        "100": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced_mimed"
+        },
+        "101": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_reduced"
+        },
+        "102": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "extra",
+            "type": "mocha-4"
+        },
+        "104": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "extra",
+            "type": "mocha-5"
+        },
+        "105": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "defective",
+            "type": "unknown"
+        },
+        "106": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "defective",
+            "type": "unknown"
+        },
+        "108": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_birthday_reduced"
+        },
+        "109": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced"
+        },
+        "110": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_tree_reduced"
+        },
+        "111": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_kitchen_reduced"
+        },
+        "112": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday_reduced"
+        },
+        "113": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_tiny"
+        },
+        "114": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_tiny"
+        },
+        "115": {
+            "audio": true,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen_reduced_mimed"
+        }
+    },
+    "405": {
+        "5": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "demo_2_sentences"
+        },
+        "6": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "demo_2_sentences"
+        },
+        "13": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen"
+        },
+        "14": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree"
+        },
+        "15": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday"
+        },
+        "24": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen"
+        },
+        "25": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree"
+        },
+        "26": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday"
+        },
+        "32": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_kitchen"
+        },
+        "33": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_tree"
+        },
+        "34": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "picture_description_birthday"
+        },
+        "38": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_1"
+        },
+        "39": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_2"
+        },
+        "40": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "edgefield_sentences_3"
+        },
+        "47": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_4"
+        },
+        "48": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_5"
+        },
+        "51": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_7"
+        },
+        "52": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_8"
+        },
+        "53": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "training",
+            "type": "edgefield_sentences_9"
+        },
+        "54": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_kitchen"
+        },
+        "55": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_tree"
+        },
+        "56": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "validation",
+            "type": "picture_description_birthday"
+        },
+        "75": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "testing",
+            "type": "picture_description_kitchen"
+        },
+        "76": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "testing",
+            "type": "picture_description_tree"
+        },
+        "77": {
+            "audio": false,
+            "bipolar": true,
+            "default_dataset": "testing",
+            "type": "picture_description_birthday"
+        }
+    }
 }

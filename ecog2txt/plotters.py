@@ -59,9 +59,8 @@ class DecodingResults:
         if os.path.isfile(decoding_results_file_name):
             self.vprint('Found decoding results; loading into attributes...')
             try:
-                with open(decoding_results_file_name, 'r') as fp:
-                    hickled_data = hickle.load(fp)
-            except:  # ModuleNotFoundError:
+                hickled_data = hickle.load(decoding_results_file_name)
+            except BaseException as e:  # ModuleNotFoundError:
                 # HACK for backward compatibility with old code structure:
                 #  a function may have been saved in the hickle file.
                 sys.modules['pycode.ecog2txt'] = ecog2txt
@@ -69,10 +68,8 @@ class DecodingResults:
                 # A hack for a hack--required for later versions of sys...
                 sys.modules['pycode'] = ecog2txt
                 ########
-                with open(decoding_results_file_name, 'r') as fp:
-                    pdb.set_trace()
-                    hickled_data = hickle.load(fp)
-
+                hickled_data = hickle.load(decoding_results_file_name)
+                
 
             # for some results, you saved a list of the training_blocks sets
             blocks = np.array(hickled_data[0]['training_blocks'])
@@ -718,7 +715,7 @@ class ResultsPlotter():
         xmin, xmax = ax.get_xlim()
         ax.set_xlim((0, xmax))
         ax.set_ylim((ymin, ymax))
-        ax.grid(b=True, color='black')
+        ax.grid(visible=True, color='black')
         ax.set_xticks(x_major_ticks)
         ax.set_yticks(y_major_ticks)
         ax.set_xlabel(x_label)
@@ -1040,8 +1037,10 @@ class ResultsPlotter():
                 'aspect': 1/3,
                 'height': 3.0
             }
-            x_data = 'scatter_y'
-            y_data = 'contributions'
+            x_scatter_data = 'scatter_y'
+            y_scatter_data = 'contributions'
+            x_kde_data = None
+            y_kde_data = 'contributions'
             ax_line = plt.axvline
             ax_line_kwargs = {'x': 0}
         else:
@@ -1051,8 +1050,10 @@ class ResultsPlotter():
                 'aspect': 6,
                 'height': 0.75
             }
-            x_data = 'contributions'
-            y_data = 'scatter_y'
+            x_scatter_data = 'contributions'
+            y_scatter_data = 'scatter_y'
+            x_kde_data = 'contributions'
+            y_kde_data = None
             ax_line = plt.axhline
             ax_line_kwargs = {'y': 0}
 
@@ -1070,23 +1071,27 @@ class ResultsPlotter():
         start, fraction, saturation = cubehelix2params(self.RGB_color, rotation)
         self.vprint('CANONICAL COLOR AT FRACTION {0}'.format(fraction))
         palette = sns.cubehelix_palette(
-            10, start=start, rot=rotation, light=.7, hue=saturation)
+            10, start=start, rot=rotation, light=.7, hue=saturation
+        )
         facet_grid = sns.FacetGrid(
             df, hue='areas', palette=palette,
-            hue_order=self.anatomy_grand_list, **facet_kwargs)
+            hue_order=self.anatomy_grand_list, **facet_kwargs
+        )
 
         # draw the densities in a few steps
-        facet_grid.map(
-            getattr(sns, plot_type), 'contributions', clip=[0, 1.0], shade=True,
-            alpha=1, lw=1.5, bw_adjust=bw_adjust, vertical=VERTICAL)
-        facet_grid.map(
-            getattr(sns, plot_type), 'contributions', clip=[0, 1.0], color="w",
-            lw=2, bw_adjust=bw_adjust, vertical=VERTICAL)
+        facet_grid.map_dataframe(
+            getattr(sns, plot_type), x=x_kde_data, y=y_kde_data,
+            clip=[0, 1.0], fill=True, alpha=1, lw=1.5, bw_adjust=bw_adjust
+        )
+        facet_grid.map_dataframe(
+            getattr(sns, plot_type), x=x_kde_data, y=y_kde_data,
+            clip=[0, 1.0], color="w", lw=2, bw_adjust=bw_adjust
+        )
         facet_grid.map(ax_line, **ax_line_kwargs, lw=2, clip_on=False)
         facet_grid.map_dataframe(
-            plt.scatter, y=y_data, x=x_data, color='black',
-            edgecolors='white', linewidths=1.0, s=200.0,
-            zorder=3)
+            plt.scatter, x=x_scatter_data, y=y_scatter_data, color='black',
+            edgecolors='white', linewidths=1.0, s=200.0, zorder=3
+        )
 
         # define function to set the upper bound for all plots
         def set_y_upper_bound(x, lower, label, upper, color):
@@ -1103,15 +1108,18 @@ class ResultsPlotter():
             this_color = color if label_color is None else label_color
             ax.text(
                 1.0, .1, label, fontweight="bold", color=this_color,
-                ha="right", va="center", transform=ax.transAxes, fontsize=16)
+                ha="right", va="center", transform=ax.transAxes, fontsize=16
+            )
 
         if VERTICAL:
             facet_grid.map(
-                set_x_upper_bound, 'contributions', lower=0, upper=y_upper_bound)
+                set_x_upper_bound, 'contributions', lower=0, upper=y_upper_bound
+            )
             facet_grid.fig.subplots_adjust(wspace=-0.75)
         else:
             facet_grid.map(
-                set_y_upper_bound, 'contributions', lower=0, upper=y_upper_bound)
+                set_y_upper_bound, 'contributions', lower=0, upper=y_upper_bound
+            )
             facet_grid.map(label, "contributions")
             facet_grid.fig.subplots_adjust(hspace=-0.75)
             ax = plt.gca()
@@ -1514,7 +1522,10 @@ def suffix_to_label(suffix, BOLD_LABEL=False):
     label += '\\text{ (' + id_bits[-1].upper() + ')}'
     label = '$' + label + '$'  # for tikz
     '''
-    if 'via' in id_bits:
+    if 'cross-subject' in id_bits:
+        # bit of a hack....
+        label = ' '.join(id_bits[1:-2])
+    elif 'via' in id_bits:
         if 'mochastar' in id_bits:
             label = '+dual TL'
         else:
@@ -1781,7 +1792,7 @@ def plot_annotated_performances(
 
 def plot_performance(
     plotters_list, performance_measure, plot_type, fig_num=0,
-    y_major_ticks=None, ymin=0.0, ymax=100.0, BOLD_FIRST_LABEL=False
+    y_major_ticks=None, ymin=0.0, ymax=100.0, BOLD_FIRST_LABEL=False, ax=None
 ):
 
     ######
@@ -1803,8 +1814,9 @@ def plot_performance(
             for WER in getattr(plotter, performance_measure).data
         ],
         # convert to percent!
+        # NB: last [-1] element of row is from training under all data
         measure_name: [
-            WER[0]*100 for plotter in plotters_list
+            WER[-1]*100 for plotter in plotters_list
             for WER in getattr(plotter, performance_measure).data
         ]
     })
@@ -1816,7 +1828,7 @@ def plot_performance(
         for plotter in plotters_list
     }
 
-    kwargs = {}
+    kwargs = {'ax': ax}
     if plot_type in ['violinplot', 'barplot', 'boxplot']:
         kwargs.update({'palette': palette})
     if plot_type == 'violinplot':
@@ -1867,7 +1879,8 @@ def pvalue_annotate(
             try:
                 depths[x] = min(depths[x], y)
             except:
-                pdb.set_trace()
+                print('This shouldn''t happen')
+                pass # pdb.set_trace()
 
     extrema = heights
     ABOVE = True
@@ -2183,8 +2196,7 @@ def all_grid_search_projections(
         saved_results_dir, 'grid_search_{0}_conv_{1}_way{2}.hkl'.format(
             subj_id, len(grid_shape), suffix)
     )
-    with open(loadfile_name, 'r') as fp:
-        all_results, parameter_names, grids = hickle.load(fp)
+    all_results, parameter_names, grids = hickle.load(loadfile_name)
 
     # plot all
     ranges = []
