@@ -4,14 +4,14 @@ import os
 # third-party packages
 import pandas as pd
 
-from tensor2tensor.data_generators import text_encoder
+# from tensor2tensor.data_generators import text_encoder
 
 # paths
 text_dir = os.path.join(os.path.dirname(__file__), 'auxiliary')
 
 # other useful variables
-EOS_token = text_encoder.EOS
-pad_token = text_encoder.PAD
+EOS_token = '<EOS>'  # text_encoder.EOS
+pad_token = '<pad>'  # text_encoder.PAD
 OOV_token = '<OOV>'
 
 # useful sets

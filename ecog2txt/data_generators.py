@@ -6,7 +6,10 @@ import os
 import numpy as np
 from scipy.fftpack import dct
 import tensorflow as tf
-from tensor2tensor.data_generators import text_encoder
+try:
+    from tensor2tensor.data_generators import text_encoder
+except ModuleNotFoundError:
+    print('WARNING: tensor2tensor missing; skipping')
 try:
     from python_speech_features import delta, fbank, lifter
 except ModuleNotFoundError:
@@ -79,7 +82,7 @@ class ECoGDataGenerator:
         three methods:
             _get_wav_data
             _query
-            _ecog_generator
+            _ecog_token_generator
         '''
 
         # set this directly to None
@@ -378,7 +381,7 @@ class ECoGDataGenerator:
 
     def write_to_Protobuf_maybe(self, sequence_type, block_set):
 
-        from ecog2txt.subjects import SequenceDataManifest
+        from ecog2txt2.subjects import SequenceDataManifest
 
         # set up a data manifest for loading in the sequences
         manifest = SequenceDataManifest(sequence_type, num_features_raw=1)

@@ -7,10 +7,14 @@ import copy
 # third-party packages
 import numpy as np
 import tensorflow as tf
+from machine_learning.neural_networks.tf_helpers import (
+    parse_protobuf_seq2seq_example, fancy_indexing, string_seq_to_index_seq
+)
+
 
 # local
 from utils_jgm.toolbox import wer_vector, auto_attribute, str2int_hook
-from machine_learning.neural_networks import tf_helpers as tfh
+
 from ecog2txt import EOS_token, pad_token, OOV_token, DATA_PARTITIONS
 
 
@@ -208,7 +212,7 @@ class ECoGSubject:
             sequence_counter = SequenceCounter(unique_sequences, threshold)
             apply_to_all_tf_examples(
                 [target_counter, sequence_counter],
-                lambda example_proto: tfh.parse_protobuf_seq2seq_example(
+                lambda example_proto: parse_protobuf_seq2seq_example(
                     example_proto, {'decoder_targets': target_manifest},
                 ),
                 blocks, self.tf_record_partial_path
@@ -248,7 +252,7 @@ class ECoGSubject:
                 unique_sequence_list, threshold, protobuf_name='full_record')
             apply_to_all_tf_examples(
                 [sequence_counter],
-                lambda example_proto: tfh.parse_protobuf_seq2seq_example(
+                lambda example_proto: parse_protobuf_seq2seq_example(
                     example_proto, self.data_manifests
                 ),
                 blks, self.tf_record_partial_path
@@ -335,7 +339,7 @@ class SequenceDataManifest:
         if self._transform is not None:
             return self._transform
         elif self.mask is not None:
-            return lambda seq: tfh.fancy_indexing(seq, self.input_mask.inds, 1)
+            return lambda seq: fancy_indexing(seq, self.input_mask.inds, 1)
         elif self.get_feature_list is not None:
             feature_list = self.get_feature_list()
             # set the ids to some defaults if they're not in the UTL
@@ -345,11 +349,11 @@ class SequenceDataManifest:
             # Just making up "2" here can give some really weird errors...
             ########
             if self.APPEND_EOS:
-                return lambda seq: tfh.string_seq_to_index_seq(
+                return lambda seq: string_seq_to_index_seq(
                     seq, feature_list, [feature_list.index(EOS_token)], OOV_id,
                 )
             else:
-                return lambda seq: tfh.string_seq_to_index_seq(
+                return lambda seq: string_seq_to_index_seq(
                     seq, feature_list, [], OOV_id
                 )
         else:

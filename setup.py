@@ -1,11 +1,35 @@
 import setuptools
+import sys
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+python_subversion = int(sys.version.split('.')[1])
+if python_subversion > 8:
+    install_requires = [
+        'numpy',
+        'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
+        'python_speech_features', 'pyyaml',
+        'hickle==5.0.2', 'protobuf==3.20.3',
+        'tensorflow', 'tensorflow-probability',
+    ]
+else:
+    install_requires = [
+        'numpy==1.22.4',
+        'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
+        'python_speech_features', 'pyyaml',
+        'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
+        # tensorflow won't like this; ignore it
+        'hickle==5.0.2', 'protobuf==3.20.3',
+        'tensor2tensor==1.15.7', 'tensorflow-probability==0.7',
+        # 'samplerate',
+        # 'tensorflow-gpu==1.15.3'  # the cpu version will also work
+    ]
+
 setuptools.setup(
     name="ecog2txt",
-    version="0.6.0",
+    version="0.7.0",
     author="J.G. Makin",
     author_email="jgmakin@gmail.com",
     description="Code for decoding speech as text from neural data",
@@ -28,17 +52,5 @@ setuptools.setup(
         # "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-        'numpy==1.22.4',
-        'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
-        'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
-        'python_speech_features', 'pyyaml',
-        # tensorflow won't like this; ignore it
-        'hickle==5.0.2',
-        # 'protobuf==3.7',
-        'protobuf==3.20.3',
-        'tensor2tensor==1.15.7', 'tensorflow-probability==0.7',
-        # 'samplerate',
-        # 'tensorflow-gpu==1.15.3'  # the cpu version will also work
-    ],
+    install_requires=install_requires
 )

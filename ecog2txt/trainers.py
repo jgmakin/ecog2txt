@@ -17,9 +17,7 @@ from tensorflow.python.tools.inspect_checkpoint import print_tensors_in_checkpoi
 
 # local
 from utils_jgm.toolbox import heatmap_confusions, MutableNamedTuple
-from machine_learning.neural_networks import sequence_networks
 from machine_learning.neural_networks import tf_helpers as tfh
-from machine_learning.neural_networks import basic_components as nn
 from ecog2txt.subjects import ECoGSubject
 from ecog2txt import plotters, data_generators
 from ecog2txt import text_dir, TOKEN_TYPES, DATA_PARTITIONS
@@ -27,6 +25,11 @@ from ecog2txt import EOS_token, pad_token, OOV_token
 if int(tf.__version__.split('.')[0]) == 2:
     from machine_learning.neural_networks.tf_helpers_too import NeuralNetwork
     from machine_learning.neural_networks.sequence_networks_too import Seq2Seq
+    from machine_learning.neural_networks.torch_sequence_networks import Sequence2Sequence
+else:
+    from machine_learning.neural_networks import basic_components as nn
+    from machine_learning.neural_networks import sequence_networks
+
 
 '''
 :Author: J.G. Makin (except where otherwise noted)
@@ -96,15 +99,20 @@ class MultiSubjectTrainer:
 
         # create the SequenceNetwork according to the experiment_manifest
         if int(tf.__version__.split('.')[0]) == 2:
-            self.net = NeuralNetwork(
+            self.net = Sequence2Sequence(
                 self.experiment_manifest[subject_ids[-1]],
-                Seq2Seq,
-                self.ecog_subjects[-1],  # temporary hack
-                EOS_token=EOS_token,
-                pad_token=pad_token,
-                OOV_token=OOV_token,
+                self.ecog_subjects[-1],
                 **dict(SN_kwargs)
-            )
+            ).to('cuda')
+            #self.net = NeuralNetwork(
+            #     self.experiment_manifest[subject_ids[-1]],
+            #     Seq2Seq,
+            #     self.ecog_subjects[-1],  # temporary hack
+            #    EOS_token=EOS_token,
+            #    pad_token=pad_token,
+            #    OOV_token=OOV_token,
+            #    **dict(SN_kwargs)
+            #)
         else:
             self.net = sequence_networks.SequenceNetwork(
                 self.experiment_manifest[subject_ids[-1]],

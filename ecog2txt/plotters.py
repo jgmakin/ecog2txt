@@ -1549,6 +1549,8 @@ def suffix_to_label(suffix, BOLD_LABEL=False):
         label = '+task TL'
     elif 'viterbi' in id_bits:
         label = 'phoneme-based HMM'
+    elif 'cross-attention' in id_bits:
+        label = 'cross-attention'
     else:
         label = 'encoder-decoder'
 
@@ -1798,6 +1800,7 @@ def plot_performance(
     ######
     # TO DO:
     #   (1) Use y_major_ticks
+    #   (2) get rid of *100 for other performance measures....
     ######
 
     # remember to label it as percent (note multiplication by 100 below)
@@ -2351,7 +2354,7 @@ def cluster_embeddings(
             for iLabel, label in enumerate(data_labels):
                 ax.annotate(
                     label,
-                    (*reduced_embedding[None, iLabel, :]),
+                    *reduced_embedding[None, iLabel, :],
                     xycoords="data", va="center", ha="center"
                 )
     fig2.savefig(os.path.join(fig_dir, file_name))
@@ -2383,12 +2386,12 @@ def scatter_desequenced_data(
             ax.scatter(*desequenced_data[iF-1, :].T, marker='^', c=color)
             ax.annotate(
                 iSequence,
-                (*desequenced_data[None, i0, :]),
+                *desequenced_data[None, i0, :],
                 xycoords="data", va="center", ha="center",  # color=color
             )
             ax.annotate(
                 iSequence,
-                (*desequenced_data[None, iF-1, :]),
+                *desequenced_data[None, iF-1, :],
                 xycoords="data", va="center", ha="center", fontweight='bold'
             )
         i0 = iF
