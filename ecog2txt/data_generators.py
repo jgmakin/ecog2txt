@@ -381,7 +381,7 @@ class ECoGDataGenerator:
 
     def write_to_Protobuf_maybe(self, sequence_type, block_set):
 
-        from ecog2txt2.subjects import SequenceDataManifest
+        from ecog2txt.subjects import SequenceDataManifest
 
         # set up a data manifest for loading in the sequences
         manifest = SequenceDataManifest(sequence_type, num_features_raw=1)

@@ -69,15 +69,18 @@ class DecodingResults:
                 sys.modules['pycode'] = ecog2txt
                 ########
                 hickled_data = hickle.load(decoding_results_file_name)
-                
 
+            # for backward compatibility with old saved results
+            if type(hickled_data) is tuple:
+                hickled_data = hickled_data[0]
+                
             # for some results, you saved a list of the training_blocks sets
-            blocks = np.array(hickled_data[0]['training_blocks'])
+            blocks = np.array(hickled_data['training_blocks'])
             self.Ndatasizes = len({len(blks) for blks in blocks})
             self.training_blocks = np.reshape(blocks, (-1, self.Ndatasizes))
 
             # for most results, you saved a list of the validation_blocks
-            blocks = np.array(hickled_data[0]['validation_blocks'])
+            blocks = np.array(hickled_data['validation_blocks'])
             ############
             # Is this still necessary??
             if type(blocks[0]) is set:
@@ -90,7 +93,7 @@ class DecodingResults:
 
             # all results in *percent*
             for result in ['word_error_rate', 'accuracy', 'nums_seconds']:
-                data = hickled_data[0][result]
+                data = hickled_data[result]
                 data = data[:, -1] if len(data.shape) == 2 else data
                 setattr(self, result, ResultsMatrix(np.reshape(
                     data, (-1, self.Ndatasizes))))
@@ -152,8 +155,7 @@ class ResultsPlotter():
         # ).format(self.subject.subnet_id, experiment)
         # if os.path.isfile(occlusion_results_file_name):
         #     self.vprint('Found occlusion results; loading into attributes...')
-        #     with open(occlusion_results_file_name, 'r') as fp:
-        #         hickled_data = hickle.load(fp)
+        #     hickled_data = hickle.load(occlusion_results_file_name)
         #     self.masked_start_electrodes = hickled_data[2]
         #     self.masked_word_error_rates = hickled_data[0]['word_error_rate']
         # else:
@@ -1526,15 +1528,25 @@ def suffix_to_label(suffix, BOLD_LABEL=False):
         # bit of a hack....
         label = ' '.join(id_bits[1:-2])
     elif 'via' in id_bits:
+        i = id_bits.index('with') + 1
+        transfer_ids = []
+        while id_bits[i].isdigit():
+            transfer_ids.append(id_bits[i])
+            i += 1
         if 'mochastar' in id_bits:
-            label = '+dual TL'
+            label = '+dual TL (%s)' % ', '.join(transfer_ids)
         else:
-            label = '+subject TL'
+            label = '+subject TL (%s)' % ', '.join(transfer_ids)
     elif 'with' in id_bits:
+        i = id_bits.index('with') + 1
+        transfer_ids = []
+        while id_bits[i].isdigit():
+            transfer_ids.append(id_bits[i])
+            i += 1
         if 'mochastar' in id_bits:
-            label = '+dual PTL'
+            label = '+dual PTL (%s)' % ', '.join(transfer_ids)
         else:
-            label = '+subject PTL'
+            label = '+subject PTL (%s)' % ', '.join(transfer_ids)
     elif 'decimated' in id_bits:
         label = 'decimated'
     elif 'untargeted' in id_bits:
@@ -1832,15 +1844,16 @@ def plot_performance(
     }
 
     kwargs = {'ax': ax}
-    if plot_type in ['violinplot', 'barplot', 'boxplot']:
+    if plot_type in ['violinplot', 'barplot', 'boxplot', 'swarmplot']:
         kwargs.update({'palette': palette})
     if plot_type == 'violinplot':
         kwargs.update({'inner': 'stick'})
-    elif plot_type == 'swarmplot':
-        kwargs.update({'color': ".25"})
+    # elif plot_type == 'swarmplot':
+    #     kwargs.update({'color': ".25"})
+    #     # kwargs.update({'palette': "dark:.25"})
 
     ax = getattr(sns, plot_type)(
-        x='label', y=measure_name, data=df,
+        x='label', y=measure_name, data=df, hue='label',
         order=[
             suffix_to_label(
                 plotter.suffix,
@@ -1909,6 +1922,7 @@ def pvalue_annotate(
         # dh=annotation_offsets[key],
         max_asterisk=3
     )
+
 
 def get_save_path(fig_type, plotters_list):
 

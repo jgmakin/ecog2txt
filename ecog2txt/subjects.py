@@ -40,6 +40,7 @@ class ECoGSubject:
         data_mapping=None,
         decimation_factor=None,  # has priority over sampling_rate_decimated
         sampling_rate_decimated=None,
+        json_dir=None,
         #####
         # private; do no assign to self
         _DG_kwargs=(),
@@ -67,8 +68,8 @@ class ECoGSubject:
         '''
 
         # get the block_breakdowns
-        json_dir = manifest['json_dir']
-        with open(os.path.join(json_dir, 'block_breakdowns.json')) as f:
+        # json_dir = manifest['json_dir']
+        with open(os.path.join(self.json_dir, 'block_breakdowns.json')) as f:
             block_breakdowns = json.load(f, object_hook=str2int_hook)[subj_id]
         self._block_dict = block_breakdowns
 

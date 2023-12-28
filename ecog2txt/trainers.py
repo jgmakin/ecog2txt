@@ -2,7 +2,7 @@
 import pdb
 import os
 import re
-from functools import reduce
+from functools import reduce, partial
 from collections import defaultdict
 
 # third-party packages
@@ -19,16 +19,17 @@ from tensorflow.python.tools.inspect_checkpoint import print_tensors_in_checkpoi
 from utils_jgm.toolbox import heatmap_confusions, MutableNamedTuple
 from machine_learning.neural_networks import tf_helpers as tfh
 from ecog2txt.subjects import ECoGSubject
-from ecog2txt import plotters, data_generators
-from ecog2txt import text_dir, TOKEN_TYPES, DATA_PARTITIONS
+from ecog2txt import plotters, text_dir, TOKEN_TYPES, DATA_PARTITIONS
 from ecog2txt import EOS_token, pad_token, OOV_token
 if int(tf.__version__.split('.')[0]) == 2:
-    from machine_learning.neural_networks.tf_helpers_too import NeuralNetwork
-    from machine_learning.neural_networks.sequence_networks_too import Seq2Seq
-    from machine_learning.neural_networks.torch_sequence_networks import Sequence2Sequence
+    # from machine_learning.neural_networks.tf_helpers_too import NeuralNetwork
+    # from machine_learning.neural_networks.sequence_networks_too import Seq2Seq
+    from machine_learning.neural_networks.torch_sequence_networks import (
+        Sequence2Sequence, SequenceTrainer
+    )
 else:
     from machine_learning.neural_networks import basic_components as nn
-    from machine_learning.neural_networks import sequence_networks
+    from machine_learning.neural_networks.sequence_networks import SequenceNetwork
 
 
 '''
@@ -99,22 +100,19 @@ class MultiSubjectTrainer:
 
         # create the SequenceNetwork according to the experiment_manifest
         if int(tf.__version__.split('.')[0]) == 2:
+            # remove SN_kwargs that aren't expected by Sequence2Sequence
+            self.ST_kwargs = {key: SN_kwargs.pop(key, None) for key in {
+                'temperature', 'EMA_decay', 'beam_width',
+                'assessment_epoch_interval', 'tf_summaries_dir'
+            }}
+            self.Nepochs = SN_kwargs.pop('Nepochs', None)
             self.net = Sequence2Sequence(
                 self.experiment_manifest[subject_ids[-1]],
-                self.ecog_subjects[-1],
+                self.ecog_subjects,
                 **dict(SN_kwargs)
-            ).to('cuda')
-            #self.net = NeuralNetwork(
-            #     self.experiment_manifest[subject_ids[-1]],
-            #     Seq2Seq,
-            #     self.ecog_subjects[-1],  # temporary hack
-            #    EOS_token=EOS_token,
-            #    pad_token=pad_token,
-            #    OOV_token=OOV_token,
-            #    **dict(SN_kwargs)
-            #)
+            )
         else:
-            self.net = sequence_networks.SequenceNetwork(
+            self.net = SequenceNetwork(
                 self.experiment_manifest[subject_ids[-1]],
                 EOS_token=EOS_token,
                 pad_token=pad_token,
@@ -191,9 +189,12 @@ class MultiSubjectTrainer:
 
                     # and now set it (extremely verbosely because of python's
                     #  idiosyncratic late binding)
-                    data_manifest.get_feature_list = (
-                        lambda class_list=class_list: class_list
-                    )
+                    # data_manifest.get_feature_list = (
+                    #     lambda class_list=class_list: class_list
+                    # )
+                    # work-around because lambdas can't be pickled
+                    data_manifest.get_feature_list = partial(_identity, class_list)
+
                 else:
                     # don't do anything for non-categorical data
                     pass
@@ -263,6 +264,29 @@ class MultiSubjectTrainer:
 
         self._results_plotter = results_plotter
 
+    def torch_learn(self):
+        import torch
+        # somewhat hacky way to shoehorn PyTorch version in here...
+
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+        ########
+        # manifest from final subject only??
+        torch_trainer = SequenceTrainer(
+            self.experiment_manifest[self.ecog_subjects[-1].subnet_id],
+            self.ecog_subjects,
+            **self.ST_kwargs,
+            REPORT_TRAINING_LOSS=True,
+        )
+        ########
+
+        # something of a hack here for multi_trainers
+        assessments = torch_trainer.train_and_assess(
+            self.Nepochs, self.net, device
+        )
+
+        return assessments
+
     def parallel_transfer_learn(self, RESUME=False, fit_kwargs=()):
         '''
         Parallel transfer learning
@@ -283,8 +307,9 @@ class MultiSubjectTrainer:
 
         # to facilitate restoring/assessing, update hard-coded restore_epochs
         if self._restore_epoch is not None:
-            self.restore_epoch = (self.restore_epoch + self.net.Nepochs
-                                  if RESUME else self.net.Nepochs)
+            self.restore_epoch = (
+                self.restore_epoch + self.net.Nepochs if RESUME else self.net.Nepochs
+            )
 
         return assessments
 
@@ -922,3 +947,7 @@ def target_inds_to_sequences(hypotheses, targets_list, iExample=0):
         for hypothesis in hypotheses[iExample]
     ]
     return predicted_tokens
+
+
+def _identity(x):
+    return x
