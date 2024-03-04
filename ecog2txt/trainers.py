@@ -24,6 +24,7 @@ from ecog2txt import EOS_token, pad_token, OOV_token
 if int(tf.__version__.split('.')[0]) == 2:
     # from machine_learning.neural_networks.tf_helpers_too import NeuralNetwork
     # from machine_learning.neural_networks.sequence_networks_too import Seq2Seq
+    # pass
     from machine_learning.neural_networks.torch_sequence_networks import (
         Sequence2Sequence, SequenceTrainer
     )

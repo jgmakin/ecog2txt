@@ -128,7 +128,6 @@ class ResultsPlotter():
         suffix='',
         contrib_method='decoder_saliency_map',
         line_style='solid',
-        VERBOSE=True,
         #####
         # in the manifest
         token_type=None,
@@ -144,8 +143,9 @@ class ResultsPlotter():
         tikz_partial_path=None,
         png_partial_path=None,
         anatomy_grand_list=None,
-        grid_names=None
+        grid_names=None,
         #####
+        VERBOSE=True,
     ):
 
         # LOAD OCCLUSION-TRAINED DECODING RESULTS
@@ -188,12 +188,14 @@ class ResultsPlotter():
             # check if the argument works as a subdir of its predecessor
             full_dir = os.path.join(self._saved_results_dir, saved_results_dir)
             if os.path.isdir(full_dir):
-                print("INTERPRETING USER-PROVIDED SAVED_RESULTS_DIR AS SUBDIR")
+                if self.VERBOSE:
+                    print("INTERPRETING USER-PROVIDED SAVED_RESULTS_DIR AS SUBDIR")
                 self._saved_results_dir = full_dir
                 return
 
         # ok, it's the whole path
-        print("USING USER-PROVIDED SAVED_RESULTS_DIR")
+        if self.VERBOSE:
+            print("USING USER-PROVIDED SAVED_RESULTS_DIR")
         self._saved_results_dir = saved_results_dir
 
     @property
@@ -2194,7 +2196,8 @@ def project_grid_search(
     sns.heatmap(
         np.squeeze(performance), square=True, annot=True, ax=ax,
         cbar=False, vmin=0, vmax=vmax, mask=np.isnan(np.squeeze(performance)),
-        xticklabels=heatmap_axes[1], yticklabels=heatmap_axes[0])
+        xticklabels=heatmap_axes[1], yticklabels=heatmap_axes[0]
+    )
     ax.set(xlabel=nonmarginal_params[1], ylabel=nonmarginal_params[0])
 
     return performance
