@@ -858,6 +858,7 @@ class MultiSubjectTrainer:
                 print(example.keys())
         '''
 
+        tf.compat.v1.disable_eager_execution()
         tf.compat.v1.reset_default_graph()
 
         # get the requested ECoGSubject
