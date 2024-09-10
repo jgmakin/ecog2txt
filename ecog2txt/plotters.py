@@ -703,6 +703,7 @@ class ResultsPlotter():
             data_amount = self.nums_counted_repeats
             x_label = 'number of training repeats'
         else:
+            pdb.set_trace()
             raise ValueError("Unexpected variable to plot! - jgm")
 
         # plot
@@ -723,7 +724,7 @@ class ResultsPlotter():
         ax.set_xticks(x_major_ticks)
         ax.set_yticks(y_major_ticks)
         ax.set_xlabel(x_label)
-        ax.set_ylabel(performance_measure.replace('_', ' ') + ' (\%)')
+        ax.set_ylabel(performance_measure.replace('_', ' ') + r' (\%)')
 
         #ax.spines['bottom'].set_color('1.0')
         #ax.spines['top'].set_color('1.0')
@@ -1473,7 +1474,7 @@ class ResultsPlotter():
 
         plt.xticks(x_inds, [dataset + '\n(all)' for dataset in datasets_to_plot] +
                    [dataset + '\n(unique)' for dataset in datasets_to_plot])
-        plt.ylabel('\# sentences')
+        plt.ylabel(r'\# sentences')
         if ymax is not None:
             axes = plt.gca()
             ylim = axes.get_ylim()
@@ -1687,13 +1688,13 @@ def plot_performances_vs_amount_of_training_data(
             lambda s: s is not None,
             [performance_measure, file_infix, file_suffix]
         ))
-        tpl_save(
-            filepath=tikz_partial_path.format(file_name),
-            extra_axis_parameters=extra_axis_parameters,
-            extra_lines_start=extra_lines_start,
-            extra_body_parameters=extra_body_parameters,
-            strict=True,
-        )
+        # tpl_save(
+        #     filepath=tikz_partial_path.format(file_name),
+        #     extra_axis_parameters=extra_axis_parameters,
+        #     extra_lines_start=extra_lines_start,
+        #     extra_body_parameters=extra_body_parameters,
+        #     strict=True,
+        # )
 
         # save
         if line_style_dict:
@@ -1818,7 +1819,7 @@ def plot_performance(
     ######
 
     # remember to label it as percent (note multiplication by 100 below)
-    measure_name = performance_measure.replace('_', ' ') + ' (\%)'
+    measure_name = performance_measure.replace('_', ' ') + r' (\%)'
 
     plt.figure(fig_num)
     df = pd.DataFrame({
@@ -2280,7 +2281,7 @@ def print_latex_anatomical_legend():
 
     # print LaTeX code defining the new colors
     for color, area in zip(RGB_colors, brain_areas):
-        print('\providecolor{{{0}}}{{RGB}}{{{1},{2},{3}}}'.format(area.replace(' ',''), *color))
+        print(r'\providecolor{{{0}}}{{RGB}}{{{1},{2},{3}}}'.format(area.replace(' ',''), *color))
     print('')
 
     # print LaTeX/TikZ code creating a command->figure->legend
@@ -2428,8 +2429,8 @@ def effect_of_tabularizer(summary_dict):
                                     for suffix in comparisons.keys()]
                 if iSubj == 0:
                     labels = tentative_labels
-                    hline = '\\\\\hline'
-                    print('\\begin{tabular}{r%s}' % ('|c'*(len(labels)+1)))
+                    hline = r'\\\\\hline'
+                    print(r'\begin{tabular}{r%s}' % ('|c'*(len(labels)+1)))
                     print('participant & baseline: & ' + ' & '.join(labels)
                           + hline + '\\hline')
                 else:

@@ -459,7 +459,7 @@ class MultiSubjectTrainer:
                 subsubnet = name_scopes.pop(0)
 
                 # if this is a subnetwork, find out which one
-                if re.match('subnet_\d*', subsubnet):
+                if re.match(r'subnet_\d*', subsubnet):
                     subnet_id = subsubnet.split('_')[1]
                     subsubnet = name_scopes.pop(0)
                 else:
@@ -467,7 +467,7 @@ class MultiSubjectTrainer:
 
                 # check if it's an RNN
                 for scope in name_scopes:
-                    match_obj = re.match('cell_\d*', scope)
+                    match_obj = re.match(r'cell_\d*', scope)
                     if match_obj:
                         layer_number = int(match_obj[0].split('_')[-1])
                         break

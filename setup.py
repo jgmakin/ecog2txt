@@ -19,7 +19,7 @@ else:
         'numpy==1.22.4',
         'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
         'python_speech_features', 'pyyaml',
-        'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
+        # 'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
         # tensorflow won't like this; ignore it
         'hickle==5.0.2', 'protobuf==3.20.3',
         'tensor2tensor==1.15.7', 'tensorflow-probability==0.7',

@@ -528,7 +528,8 @@ class SequenceCounter:
     def update(self, data_example):
 
         # extract the sequence as a list (of strings or indices)
-        sequence = data_example['decoder_targets'][:, 0].tolist()
+        ### sequence = data_example['decoder_targets'][:, 0].tolist()
+        sequence = data_example['decoder_targets'][:, 0]._numpy().tolist()
         if type(sequence[0]) is bytes:
             sequence = [b.decode('utf-8') for b in sequence]
         if type(sequence[0]) is str:
@@ -540,8 +541,10 @@ class SequenceCounter:
         # if at least one sequence has been added to the list...
         if self.unique_sequence_list:
             # ...then get their word error rate from the current sequence
-            WERs = wer_vector(self.unique_sequence_list,
-                              [sequence]*len(self.unique_sequence_list))
+            WERs = wer_vector(
+                self.unique_sequence_list,
+                [sequence]*len(self.unique_sequence_list)
+            )
 
             # if this sequence is close enough to an observed sequence...
             if np.min(WERs) < self.threshold:
@@ -597,18 +600,26 @@ def synchronize_sequence_counters(sequence_counters):
 
 def apply_to_all_tf_examples(examplers, map_fxn, blks, tf_record_partial_path):
 
-    tf.compat.v1.reset_default_graph()
-    data_graph = tf.Graph()
-    with data_graph.as_default():
+    if int(tf.__version__.split('.')[0]) == 2:
         dataset = tf.data.TFRecordDataset([
             tf_record_partial_path.format(blk) for blk in blks])
         dataset = dataset.map(map_fxn, num_parallel_calls=32)
-        get_next_example = dataset.make_one_shot_iterator().get_next()
-        sess = tf.compat.v1.Session()
-    while True:
-        try:
-            next_example = sess.run(get_next_example)
+        for example in dataset:
             for exampler in examplers:
-                exampler.update(next_example)
-        except tf.errors.OutOfRangeError:
-            break
+                exampler.update(example)
+    else:
+        tf.compat.v1.reset_default_graph()
+        data_graph = tf.Graph()
+        with data_graph.as_default():
+            dataset = tf.data.TFRecordDataset([
+                tf_record_partial_path.format(blk) for blk in blks])
+            dataset = dataset.map(map_fxn, num_parallel_calls=32)
+            get_next_example = dataset.make_one_shot_iterator().get_next()
+            sess = tf.compat.v1.Session()
+        while True:
+            try:
+                next_example = sess.run(get_next_example)
+                for exampler in examplers:
+                    exampler.update(next_example)
+            except tf.errors.OutOfRangeError:
+                break
