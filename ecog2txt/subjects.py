@@ -603,7 +603,7 @@ def apply_to_all_tf_examples(examplers, map_fxn, blks, tf_record_partial_path):
     if int(tf.__version__.split('.')[0]) == 2:
         dataset = tf.data.TFRecordDataset([
             tf_record_partial_path.format(blk) for blk in blks])
-        dataset = dataset.map(map_fxn, num_parallel_calls=32)
+        dataset = dataset.map(map_fxn)
         for example in dataset:
             for exampler in examplers:
                 exampler.update(example)

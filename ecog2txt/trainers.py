@@ -53,6 +53,9 @@ class MultiSubjectTrainer:
         **kwargs
     ):
 
+        # ...
+        SN_kwargs = dict(SN_kwargs)
+
         # load the experiment_manifest
         with open(os.path.join(text_dir, experiment_manifest_name)) as file:
             self.experiment_manifest = yaml.full_load(file)
