@@ -105,14 +105,22 @@ class MultiSubjectTrainer:
         # create the SequenceNetwork according to the experiment_manifest
         if int(tf.__version__.split('.')[0]) == 2:
             # remove SN_kwargs that aren't expected by Sequence2Sequence
-            self.ST_kwargs = {key: SN_kwargs.pop(key, None) for key in {
-                'temperature', 'EMA_decay', 'beam_width',
-                'assessment_epoch_interval', 'tf_summaries_dir'
-            }}
-            self.Nepochs = SN_kwargs.pop('Nepochs', None)
+            self.ST_kwargs = {
+                key: SN_kwargs.pop(key) for key in {
+                    'temperature', 'EMA_decay', 'beam_width',
+                    'assessment_epoch_interval', 'tf_summaries_dir',
+                    'N_cases',
+                } if key in SN_kwargs
+            }
+            self.N_epochs = SN_kwargs.pop('N_epochs', None)
             self.net = Sequence2Sequence(
                 self.experiment_manifest[subject_ids[-1]],
                 self.ecog_subjects,
+                EOS_token=EOS_token,
+                pad_token=pad_token,
+                # OOV_token=OOV_token,
+                TARGETS_ARE_SEQUENCES='sequence' in token_type,
+                VERBOSE=VERBOSE,
                 **dict(SN_kwargs)
             )
         else:
@@ -286,7 +294,7 @@ class MultiSubjectTrainer:
 
         # something of a hack here for multi_trainers
         assessments = torch_trainer.train_and_assess(
-            self.Nepochs, self.net, device
+            self.N_epochs, self.net, device
         )
 
         return assessments
@@ -312,7 +320,7 @@ class MultiSubjectTrainer:
         # to facilitate restoring/assessing, update hard-coded restore_epochs
         if self._restore_epoch is not None:
             self.restore_epoch = (
-                self.restore_epoch + self.net.Nepochs if RESUME else self.net.Nepochs
+                self.restore_epoch + self.net.N_epochs if RESUME else self.net.N_epochs
             )
 
         return assessments
@@ -339,24 +347,24 @@ class MultiSubjectTrainer:
                 fit_kwargs['reuse_vars_scope'] = None
             else:
                 # first acquire this subject's encoder embedding
-                self.net.Nepochs = pretraining_epochs
+                self.net.N_epochs = pretraining_epochs
                 fit_kwargs['train_vars_scope'] = proprietary_scopes
                 fit_kwargs['reuse_vars_scope'] = reusable_scopes
                 fit_kwargs['_restore_epoch'] = latest_epoch
                 self.net.fit([subject], **fit_kwargs)
 
                 # then set up for next next training phase
-                latest_epoch += self.net.Nepochs
+                latest_epoch += self.net.N_epochs
                 fit_kwargs['_restore_epoch'] = latest_epoch
                 fit_kwargs['reuse_vars_scope'] = 'seq2seq'
 
             # full training
             if subject == self.ecog_subjects[-1]:
                 training_epochs += posttraining_epochs
-            self.net.Nepochs = training_epochs
+            self.net.N_epochs = training_epochs
             fit_kwargs['train_vars_scope'] = 'seq2seq'
             assessments = self.net.fit([subject], **fit_kwargs)
-            latest_epoch += self.net.Nepochs
+            latest_epoch += self.net.N_epochs
             self._save_results(assessments)
 
         # to facilitate restoring and assessing, store this
@@ -910,6 +918,9 @@ class MultiSubjectTrainer:
                 try:
                     yield sess.run(sequenced_op_dict)
                 except tf.errors.OutOfRangeError:
+
+                    # bring back eager execution, or other things will break
+                    tf.compat.v1.enable_eager_execution()
                     break
 
 

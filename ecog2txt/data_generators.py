@@ -288,9 +288,8 @@ class ECoGDataGenerator:
                 # pack each entry of element into its output data_struct
                 for sequence_type, data_struct in output_dict.items():
                     assert sequence_type in element, (
-                        "The sequence_type {} in the in the sequence_types"
-                        " passed to this method (or defaulted to) is not in"
-                        " the generator"
+                        "The sequence_type {} in the sequence_types passed to"
+                        " this method (or defaulted to) is not in the generator"
                     ).format(sequence_type)
                     token = element[sequence_type]
                     if type(data_struct) is list:
@@ -308,9 +307,10 @@ class ECoGDataGenerator:
                 i_example += 1
 
         # some information
-        print('\n\n')
-        print('WARNING: %i of %i sequences' % (num_clipped, i_example), end='')
-        print(' (%.2f%%) have been clipped' % (100*num_clipped/i_example))
+        if num_clipped > 0:
+            print('\n\n')
+            print('WARNING: %i of %i sequences' % (num_clipped, i_example), end='')
+            print(' (%.2f%%) have been clipped' % (100*num_clipped/i_example))
 
         return output_dict
 

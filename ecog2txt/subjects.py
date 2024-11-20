@@ -345,8 +345,10 @@ class SequenceDataManifest:
             feature_list = self.get_feature_list()
             # set the ids to some defaults if they're not in the UTL
             ########
-            OOV_id = (feature_list.index(OOV_token)
-                      if OOV_token in feature_list else 2)
+            OOV_id = (
+                feature_list.index(OOV_token)
+                if OOV_token in feature_list else 2
+            )
             # Just making up "2" here can give some really weird errors...
             ########
             if self.APPEND_EOS:

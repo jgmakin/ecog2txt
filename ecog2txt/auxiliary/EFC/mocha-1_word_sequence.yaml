@@ -4,7 +4,7 @@
   DataGenerator: &id001 !!python/name:ecog2txt.makin_lab_data_generators.SpeechDataGenerator ''
   EMA_decay: 0.99
   FF_dropout: 0.1
-  Nepochs: 800
+  N_epochs: 800
   REFERENCE_BIPOLAR: true
   RGB_color: !!python/tuple
   - 0.4
@@ -90,7 +90,7 @@
   DataGenerator: !!python/name:ecog2txt.makin_lab_data_generators.SpeechDataGenerator ''
   EMA_decay: 0.99
   FF_dropout: 0.1
-  Nepochs: 800
+  N_epochs: 800
   REFERENCE_BIPOLAR: true
   RGB_color: !!python/tuple
   - 0.9058823529411765
@@ -175,7 +175,7 @@
   DataGenerator: *id001
   EMA_decay: 0.99
   FF_dropout: 0.1
-  Nepochs: 800
+  N_epochs: 800
   REFERENCE_BIPOLAR: true
   RGB_color: !!python/tuple
   - 0.4588235294117647
@@ -260,7 +260,7 @@
   DataGenerator: *id001
   EMA_decay: 0.99
   FF_dropout: 0.1
-  Nepochs: 800
+  N_epochs: 800
   REFERENCE_BIPOLAR: true
   RGB_color: !!python/tuple
   - 0.6509803921568628
