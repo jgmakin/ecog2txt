@@ -118,7 +118,6 @@ class MultiSubjectTrainer:
                 self.ecog_subjects,
                 EOS_token=EOS_token,
                 pad_token=pad_token,
-                # OOV_token=OOV_token,
                 TARGETS_ARE_SEQUENCES='sequence' in token_type,
                 VERBOSE=VERBOSE,
                 **dict(SN_kwargs)
@@ -288,7 +287,9 @@ class MultiSubjectTrainer:
             self.experiment_manifest[self.ecog_subjects[-1].subnet_id],
             self.ecog_subjects,
             **self.ST_kwargs,
+            OOV_token=OOV_token,
             REPORT_TRAINING_LOSS=True,
+            TARGETS_ARE_SEQUENCES=self.net.TARGETS_ARE_SEQUENCES,
         )
         ########
 
@@ -918,9 +919,6 @@ class MultiSubjectTrainer:
                 try:
                     yield sess.run(sequenced_op_dict)
                 except tf.errors.OutOfRangeError:
-
-                    # bring back eager execution, or other things will break
-                    tf.compat.v1.enable_eager_execution()
                     break
 
 
