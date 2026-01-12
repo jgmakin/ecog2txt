@@ -8,16 +8,20 @@ with open("README.md", "r") as fh:
 python_subversion = int(sys.version.split('.')[1])
 if python_subversion > 8:
     install_requires = [
-        'numpy',
-        'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
+        'numpy', 'scipy', 'matplotlib', 'pandas', 'seaborn',
+        # 'tikzplotlib',
+        'matplot2tikz',
         'python_speech_features', 'pyyaml',
-        'hickle==5.0.2', 'protobuf==3.20.3',
+        'hickle==5.0.2',
+        # 'protobuf==3.20.3', not sure about this
         'tensorflow', 'tensorflow-probability',
     ]
 else:
     install_requires = [
         'numpy==1.22.4',
-        'scipy', 'matplotlib', 'pandas', 'seaborn', 'tikzplotlib',
+        'scipy', 'matplotlib', 'pandas', 'seaborn',
+        # 'tikzplotlib',
+        'matplot2tikz',
         'python_speech_features', 'pyyaml',
         # 'dopamine-rl==2.0.5', 'jax==0.3.13', 'jaxlib==0.3.10', 'flax==0.4.2',
         # tensorflow won't like this; ignore it
