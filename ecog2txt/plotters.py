@@ -347,7 +347,7 @@ class ResultsPlotter():
         good_channels = self.subject.data_generator.good_channels
 
         # in all cases the object is a matrix (2-dimensional)
-        if self.subject.data_generator.REFERENCE_BIPOLAR:
+        if self.subject.data_generator.referencing == 'bipolar':
             return self.subject.data_generator.bipolar_to_elec_map[
                 good_channels, :]
         else:
@@ -2148,6 +2148,7 @@ def apply_comparisons(partial_path, comparisons, application_fxn, VERBOSE):
                 partial_path % comparison_suffix, VERBOSE)
             baseline_results = DecodingResults(
                 partial_path % baseline_suffix, VERBOSE)
+            pdb.set_trace()
 
             # ...
             application_fxn(

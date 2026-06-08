@@ -5,8 +5,9 @@ import os
 # third-party packages
 import numpy as np
 from scipy.fftpack import dct
-import tensorflow as tf
 try:
+    import tensorflow as tf
+    from machine_learning.neural_networks import tf_helpers as tfh
     from tensor2tensor.data_generators import text_encoder
 except ModuleNotFoundError:
     print('WARNING: tensor2tensor missing; skipping')
@@ -16,7 +17,6 @@ except ModuleNotFoundError:
     pass
 
 # local
-from machine_learning.neural_networks import tf_helpers as tfh
 from utils_jgm.toolbox import auto_attribute
 from ecog2txt import text_dir
 
@@ -57,7 +57,7 @@ class ECoGDataGenerator:
         USE_LOG_MELS=None,
         USE_MFCC_DELTAS=None,
         USE_FIELD_POTENTIALS=None,
-        REFERENCE_BIPOLAR=None,
+        referencing='bipolar',
         num_mel_features=None,
         sampling_rate=None,
         token_type=None,
@@ -122,7 +122,7 @@ class ECoGDataGenerator:
     @property
     def tf_record_partial_path(self):
         # something of a hack: insert a subdir before the file name
-        if self.REFERENCE_BIPOLAR and self.grid_step > 1:
+        if self.referencing == 'bipolar' and self.grid_step > 1:
             subdir = 'lowdensity_bipolar'
             return os.path.join(
                 os.path.dirname(self._tf_record_partial_path),
@@ -200,8 +200,8 @@ class ECoGDataGenerator:
     def good_channels(self):
         '''
         Pseudo-channels, constructed (on the fly) from the physical electrodes.
-        For now at least, we won't USE_FIELD_POTENTIALS if we want to
-        REFERENCE_BIPOLAR.
+        For now at least, we won't USE_FIELD_POTENTIALS if we want bipolar
+        referencing.
 
         NB!!: The *order* of these channels matters--it determines the order of
         the input data, and therefore is required by the functions that plot
@@ -220,7 +220,7 @@ class ECoGDataGenerator:
                 [e for e in all_electrodes if e in self.good_electrodes] +
                 [e+M for e in all_electrodes if e in self.good_electrodes]
             )
-        elif self.REFERENCE_BIPOLAR:
+        elif self.referencing == 'bipolar':
             return [
                 ch for ch, elec_pair in enumerate(self.bipolar_to_elec_map)
                 if all([e in self.good_electrodes for e in elec_pair])

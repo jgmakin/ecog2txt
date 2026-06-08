@@ -5,7 +5,7 @@
   EMA_decay: 0.99
   FF_dropout: 0.1
   N_epochs: 800
-  REFERENCE_BIPOLAR: true
+  referencing: bipolar
   RGB_color: !!python/tuple
   - 0.4
   - 0.6509803921568628
@@ -91,7 +91,7 @@
   EMA_decay: 0.99
   FF_dropout: 0.1
   N_epochs: 800
-  REFERENCE_BIPOLAR: true
+  referencing: bipolar
   RGB_color: !!python/tuple
   - 0.9058823529411765
   - 0.1607843137254902
@@ -176,7 +176,7 @@
   EMA_decay: 0.99
   FF_dropout: 0.1
   N_epochs: 800
-  REFERENCE_BIPOLAR: true
+  referencing: bipolar
   RGB_color: !!python/tuple
   - 0.4588235294117647
   - 0.4392156862745098
@@ -261,7 +261,7 @@
   EMA_decay: 0.99
   FF_dropout: 0.1
   N_epochs: 800
-  REFERENCE_BIPOLAR: true
+  referencing: bipolar
   RGB_color: !!python/tuple
   - 0.6509803921568628
   - 0.4627450980392157
